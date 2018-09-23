@@ -12,17 +12,26 @@ function setup() {
   }
   var observer = new MutationObserver((mutations) => {
     mutations.forEach((mutationRecord) => {
-      const skip = document.querySelector('#movie_player > div.video-ads > div > div > div.videoAdUiSkipContainer.html5-stop-propagation > button');
-      if (skip) {
-        skip.click();
-        console.log("YoutubeAutoSkipper skip ads!");
-      }
-      const close = document.querySelector('div.close-padding');
-      if (close) {
-        close.click();
-        console.log("YoutubeAutoSkipper closes ads!");
-      }
+      skip();
+      close();
     });
   });
   observer.observe(target, { childList: true });
+};
+
+function skip() {
+  const div = document.querySelector('div.videoAdUiSkipContainer > button');
+  if (div) {
+    div.click();
+    console.log("YoutubeAutoSkipper skip ads!");
+    setTimeout(skip, 500);
+  }
+};
+
+function close() {
+  const div = document.querySelector('div.close-padding');
+  if (div) {
+    div.click();
+    console.log("YoutubeAutoSkipper closes ads!");
+  }
 };

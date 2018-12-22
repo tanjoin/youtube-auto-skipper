@@ -5,7 +5,7 @@
 })(this.self || global);
 
 function setup() {
-  var target = document.querySelector('#movie_player > div.video-ads.ytp-ad-module');
+  var target = document.querySelector('body');
   if (!target) {
     window.setTimeout(setup, 500);
     return;
@@ -14,7 +14,6 @@ function setup() {
     mutations.forEach((mutationRecord) => {
       skip();
       close();
-      // vote();
     });
   });
   observer.observe(target, {
@@ -22,18 +21,6 @@ function setup() {
     subtree: true
   });
 };
-
-// function vote() {
-//   const div = document.querySelector('.ytp-ad-toggle-button.ytp-ad-instream-user-sentiment-dislike-button');;
-//   if (div) {
-//     if (label.parentElement.style.display === 'none') {
-//       return;
-//     }
-//     div.click();
-//     console.log("vote low.");
-//     setTimeout(vote, 500);
-//   }
-// }
 
 function skip() {
   const div = document.querySelector('.ytp-ad-skip-button-container');

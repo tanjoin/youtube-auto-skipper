@@ -11,10 +11,8 @@ function setup() {
     return;
   }
   var observer = new MutationObserver(records => {
-    const selector = '#overlays > ytd-thumbnail-overlay-playback-status-renderer > yt-formatted-string';
-    [...document.querySelectorAll(selector)]
-      .map((e) => e.parentElement.parentElement.parentElement.parentElement.parentElement)
-      .forEach((e) => e.style.opacity = 0.1);
+    [...document.querySelectorAll('ytd-grid-video-renderer')].filter((e) => e.querySelector('#progress')).forEach((e) => e.style.opacity = "0.1");
+    [...document.querySelectorAll('ytd-grid-video-renderer')].filter((e) => !e.querySelector('#progress')).forEach((e) => e.style.opacity = "1.0");
   });
   observer.observe(target, {
     childList: true,

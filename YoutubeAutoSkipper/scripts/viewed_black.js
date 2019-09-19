@@ -11,9 +11,10 @@ function setup() {
     return;
   }
   var observer = new MutationObserver(records => {
-    const selector = '#overlays > ytd-thumbnail-overlay-playback-status-renderer > yt-formatted-string';
+    const selector = '#overlays > ytd-thumbnail-overlay-playback-status-renderer > yt-formatted-string,#progress';
     [...document.querySelectorAll(selector)]
       .map((e) => e.parentElement.parentElement.parentElement.parentElement.parentElement)
+      .filter((e) => e != null)
       .forEach((e) => e.style.opacity = 0.1);
   });
   observer.observe(target, {

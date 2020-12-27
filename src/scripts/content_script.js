@@ -4,6 +4,8 @@
   setup();
 })(this.self || global);
 
+var ad_count = 0;
+
 function setup() {
   var target = document.querySelector('body');
   if (!target) {
@@ -11,10 +13,10 @@ function setup() {
     return;
   }
   var observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutationRecord) => {
+    if (ad_count % 3 === 0) {
       skip();
       close();
-    });
+    }
   });
   observer.observe(target, {
     childList: true,

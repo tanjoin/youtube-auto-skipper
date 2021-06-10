@@ -35,6 +35,10 @@ function setup() {
           e.preventDefault();
           e.stopPropagation();
           ygvr.style.opacity = "0.1";
+          var a = ygvr.querySelector('a');
+          if (a) {
+            localStorage.setItem('tj::' + a.href.split('&')[0].split('=')[1]);
+          }
           var bar = document.createElement('ytd-thumbnail-overlay-resume-playback-renderer');
           bar.className = "style-scope ytd-thumbnail";
           var progress = document.createElement('div');

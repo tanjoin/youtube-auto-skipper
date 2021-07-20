@@ -16,10 +16,10 @@ function setup() {
     if (viewed_black_count % 5 === 0) {
       [...document.querySelectorAll('ytd-grid-video-renderer')]
       .forEach((e) => {
-        if (e.querySelector('#progress')) {
-          e.style.opacity = "0.3";
-        } else if (localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split('=')[1])) {
+        if (localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split('=')[1])) {
           e.style.opacity = "0.1";
+        } else if (e.querySelector('#progress')) {
+          e.style.opacity = "0.3";
         } else {
           e.style.opacity = "1.0";
         }

@@ -6,6 +6,41 @@
 
 var black_button_count = 0;
 
+function addRemoveDarkButton(ygvr) {
+  var thumbnail = ygvr.querySelector('#thumbnail');
+  var overlay = ygvr.querySelector('#overlays');
+  var dismiss = document.createElement('button');
+  dismiss.className = "tj-kurakusuru";
+  dismiss.width = "30px";
+  dismiss.height = "30px";
+  dismiss.textContent = "取り消す";
+  dismiss.style.fontSize = "10px";
+  dismiss.style.position = "absolute";
+  dismiss.style.bottom = 0;
+  dismiss.style.backgroundColor = "white";
+  dismiss.style.color = "black";
+  dismiss.style.opacity = 1.0;
+  dismiss.addEventListener("click", (e) => { 
+    e.preventDefault();
+    e.stopPropagation();
+    ygvr.style.opacity = "1.0";
+    var a = ygvr.querySelector('a');
+    if (a) {
+      var titleView = ygvr.querySelector('#video-title');
+      var title = true;
+      if (titleView) {
+        title = titleView.textContent;
+      }
+      localStorage.removeItem('tj::' + a.href.split('&')[0].split('=')[1]);
+      addDarkButton(ygvr);
+      dismiss.remove();
+    }
+    var bar = overlay.querySelector('.tj-manual-bar');
+    bar.remove();
+  });
+  thumbnail.appendChild(dismiss);
+}
+
 function addDarkButton(ygvr) {
   var thumbnail = ygvr.querySelector('#thumbnail');
   var overlay = ygvr.querySelector('#overlays');
@@ -32,9 +67,11 @@ function addDarkButton(ygvr) {
         title = titleView.textContent;
       }
       localStorage.setItem('tj::' + a.href.split('&')[0].split('=')[1], title);
+      addRemoveDarkButton(ygvr);
+      dismiss.remove();
     }
     var bar = document.createElement('ytd-thumbnail-overlay-resume-playback-renderer');
-    bar.className = "style-scope ytd-thumbnail";
+    bar.className = "style-scope ytd-thumbnail tj-manual-bar";
     var progress = document.createElement('div');
     progress.id = "progress";
     progress.className = "style-scope ytd-thumbnail-overlay-resume-playback-renderer";

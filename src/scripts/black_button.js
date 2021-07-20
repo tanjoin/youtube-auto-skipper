@@ -52,7 +52,7 @@ function setup() {
   }
   var observer = new MutationObserver((mutations) => {
     if (black_button_count % 5 === 0) {
-      [...document.querySelectorAll('ytd-grid-video-renderer')]
+      [...document.querySelectorAll('ytd-grid-video-renderer'), ...document.querySelectorAll('ytd-video-renderer')]
       .filter((e) => {
         return !e.querySelector(".tj-kurakusuru");
       })

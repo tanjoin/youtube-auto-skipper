@@ -5,4 +5,10 @@
     chrome.pageAction.show(sender.tab.id);
     sendResponse({});
   });
+
+  chrome.pageAction.onClicked.addListener((tab) => {
+    chrome.tabs.executeScript(tab.id, {
+      file: 'scripts/action.js'
+    });
+  });
 })(this.self || global);

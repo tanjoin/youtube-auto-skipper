@@ -8,7 +8,7 @@ Youtube の広告を根こそぎ消すのではなく、スキップボタンが
 
 Chrome の右上にあるメニューから [その他のツール] - [拡張機能] を押す.
 
-![Chrome Menu](Resources/img1.png)
+![Chrome Menu](res/img1.png)
 
 ### 2. デベロッパーモードに切り替える
 
@@ -20,7 +20,7 @@ Chrome の右上にあるメニューから [その他のツール] - [拡張機
 
 ### 4. インストール成功確認
 
-![Chrome Extension](Resources/img3.png)
+![Chrome Extension](res/img3.png)
 
 上の画像のように拡張機能が追加されていれば完了.
 
@@ -32,7 +32,7 @@ https://www.youtube.com/
 
 開いて拡張機能のアイコンが色づいたら実行されている.
 
-![Extension Icon](Resources/img2.png)
+![Extension Icon](res/img2.png)
 
 上の画像のようになったら快適なYoutubeライフを送りましょう.
 

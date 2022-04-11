@@ -33,7 +33,9 @@ function setup() {
 function apply(tj_switch_contrast) {
   [...document.querySelectorAll('ytd-grid-video-renderer')]
   .forEach((e) => {
-    if (localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split('=')[1])) {
+    if (e.querySelector('a').href.split('&')[0].split('=')[1] && localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split('=')[1])) {
+      e.style.opacity = "0.1";
+    } else if (e.querySelector('a').href.split('&')[0].split("shorts/")[1] && localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split("shorts/")[1])) {
       e.style.opacity = "0.1";
     } else if (e.querySelector('#progress')) {
       e.style.opacity = "0.3";

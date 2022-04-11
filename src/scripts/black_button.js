@@ -31,7 +31,11 @@ function addRemoveDarkButton(ygvr) {
       if (titleView) {
         title = titleView.textContent;
       }
-      localStorage.removeItem('tj::' + a.href.split('&')[0].split('=')[1]);
+      if (a.href.split('&')[0].split('=')[1]) {
+        localStorage.removeItem('tj::' + a.href.split('&')[0].split('=')[1]);
+      } else if (a.href.split('&')[0].split("shorts/")[1]) {
+        localStorage.removeItem('tj::' + a.href.split('&')[0].split("shorts/")[1]);
+      }
       addDarkButton(ygvr);
       dismiss.remove();
     }
@@ -66,7 +70,11 @@ function addDarkButton(ygvr) {
       if (titleView) {
         title = titleView.textContent;
       }
-      localStorage.setItem('tj::' + a.href.split('&')[0].split('=')[1], title);
+      if (a.href.split('&')[0].split('=')[1]) {
+        localStorage.setItem('tj::' + a.href.split('&')[0].split('=')[1], title);
+      } else if (a.href.split('&')[0].split("shorts/")[1]) {
+        localStorage.setItem('tj::' + a.href.split('&')[0].split("shorts/")[1], title);
+      }
       addRemoveDarkButton(ygvr);
       dismiss.remove();
     }

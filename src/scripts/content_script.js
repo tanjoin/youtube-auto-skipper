@@ -1,6 +1,5 @@
 ((global) => {
   'use strict';
-  chrome.extension.sendRequest({}, (res) => {});
   setup();
 })(this.self || global);
 

@@ -1,23 +1,26 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "YoutubeAutoSkipper",
   "description": "I will see advertisements, but let me skip quickly.",
-  "version": "2021.8.3",
+  "version": "2022.4.11",
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",
     "128": "icons/128.png"
   },
-  "page_action": {
+  "action": {
     "default_icon": "icons/16.png",
     "default_title": "YoutubeAutoSkipper"
   },
   "background": {
-    "scripts": ["scripts/background.js"]
+    "service_worker": "scripts/background.js"
   },
   "permissions": [
+    "scripting",
     "storage",
-    "tabs",
+    "tabs"
+  ],
+  "host_permissions": [
     "https://www.youtube.com/",
     "https://www.youtube.com/*/*"
   ],

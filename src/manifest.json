@@ -13,9 +13,10 @@
     "default_title": "YoutubeAutoSkipper"
   },
   "background": {
-    "service_worker": "scripts/background.js"
+    "service_worker": "background.js"
   },
   "permissions": [
+    "nativeMessaging",
     "scripting",
     "storage",
     "tabs"

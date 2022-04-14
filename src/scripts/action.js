@@ -4,7 +4,6 @@ chrome.storage.local.get({
   chrome.storage.local.set({
     tj_switch_contrast: !value.tj_switch_contrast
   }, () => {
-    console.log('switched!');
     apply(!value.tj_switch_contrast);
   });
 });

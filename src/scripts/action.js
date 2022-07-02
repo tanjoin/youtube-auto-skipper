@@ -20,7 +20,7 @@ function apply(tj_switch_contrast) {
       e.style.opacity = tj_switch_contrast ? "1.0" : "0.1";
       e.style.display = tj_switch_contrast ? undefined : "none";
     } else if (e.querySelector('#progress')) {
-      e.style.opacity = "0.3";
+      e.style.opacity = "0.5";
     } else {
       e.style.opacity = tj_switch_contrast ? "0.1" : "1.0";
     }

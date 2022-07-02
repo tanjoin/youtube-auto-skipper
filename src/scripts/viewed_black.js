@@ -37,7 +37,7 @@ function apply(tj_switch_contrast) {
     } else if (e.querySelector('a').href.split('&')[0].split("shorts/")[1] && localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split("shorts/")[1])) {
       e.style.opacity = "0.1";
     } else if (e.querySelector('#progress')) {
-      e.style.opacity = "0.3";
+      e.style.opacity = "0.5";
     } else {
       e.style.opacity = "1.0";
     }

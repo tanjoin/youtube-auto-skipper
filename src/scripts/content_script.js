@@ -42,6 +42,9 @@ function close() {
 };
 
 function viewedBlack() {
+  if (document.querySelector('#viewed_black_main')) {
+    document.querySelector('#viewed_black_main').remove();
+  }
   if (location.href.split('&')[0].split('=')[1]) {
     var id = location.href.split('&')[0].split('=')[1];
     if (localStorage.getItem("tj::" + location.href.split('&')[0].split('=')[1])) { // blacked
@@ -53,6 +56,7 @@ function viewedBlack() {
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#018786";
       button.style.borderRadius = "10%";
+      button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();
@@ -68,6 +72,7 @@ function viewedBlack() {
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#6200EE";
       button.style.borderRadius = "10%";
+      button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.removeItem("tj::" + id, document.title);
         button.remove();
@@ -88,6 +93,7 @@ function viewedBlack() {
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#018786";
       button.style.borderRadius = "10%";
+      button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();
@@ -103,6 +109,7 @@ function viewedBlack() {
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#6200EE";
       button.style.borderRadius = "10%";
+      button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();

@@ -14,12 +14,16 @@ function setup() {
   }
   var observer = new MutationObserver((mutations) => {
     if (viewed_black_count % 5 === 0) {
-      chrome.storage.local.get({
-        tj_switch_contrast: false
-      }, (value) => {
-        tj_switch_contrast = value.tj_switch_contrast;
-        apply(value.tj_switch_contrast);
-      });
+      try {
+        chrome.storage.local.get({
+          tj_switch_contrast: false
+        }, (value) => {
+          tj_switch_contrast = value.tj_switch_contrast;
+          apply(value.tj_switch_contrast);
+        });
+      } catch (error) {
+        // console.error(error);
+      }
     }
     viewed_black_count++;
   });

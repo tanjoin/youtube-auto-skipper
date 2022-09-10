@@ -15,6 +15,7 @@ function setup() {
     if (ad_count % 3 === 0) {
       skip();
       close();
+      viewedBlack();
     }
   });
   observer.observe(target, {
@@ -39,3 +40,68 @@ function close() {
     console.log("YoutubeAutoSkipper closes ads!");
   }
 };
+
+function viewedBlack() {
+  if (location.href.split('&')[0].split('=')[1]) {
+    var id = location.href.split('&')[0].split('=')[1];
+    if (localStorage.getItem("tj::" + location.href.split('&')[0].split('=')[1])) { // blacked
+      let area = document.querySelector('#super-title');
+      let button = document.createElement('button');
+      button.textContent = "✓";
+      button.style.border = undefined;
+      button.style.color = "white";
+      button.style.backgroundColor = "black";
+      button.addEventListener("click", () => {
+        localStorage.setItem("tj::" + id, document.title);
+        button.remove();
+        viewedBlack();
+      });
+      area.prepend(button);
+    } else {
+      let area = document.querySelector('#super-title');
+      let button = document.createElement('button');
+      button.textContent = "✗";
+      button.style.border = undefined;
+      button.style.color = "white";
+      button.style.backgroundColor = "black";
+      button.addEventListener("click", () => {
+        localStorage.removeItem("tj::" + id, document.title);
+        button.remove();
+        viewedBlack();
+      });
+      area.prepend(button);
+    }
+    return;
+  }
+  if (location.href.split('&')[0].split("shorts/")[1]) {
+    var id = location.href.split('&')[0].split("shorts/")[1];
+    if (localStorage.getItem("tj::" + location.href.split('&')[0].split("shorts/")[1])) { // short blacked
+      let area = document.querySelector('#super-title');
+      let button = document.createElement('button');
+      button.textContent = "✓";
+      button.style.border = undefined;
+      button.style.color = "white";
+      button.style.backgroundColor = "black";
+      button.addEventListener("click", () => {
+        localStorage.setItem("tj::" + id, document.title);
+        button.remove();
+        viewedBlack();
+      });
+      area.prepend(button);
+    } else {
+      let area = document.querySelector('#super-title');
+      let button = document.createElement('button');
+      button.textContent = "✗";
+      button.style.border = undefined;
+      button.style.color = "white";
+      button.style.backgroundColor = "black";
+      button.addEventListener("click", () => {
+        localStorage.setItem("tj::" + id, document.title);
+        button.remove();
+        viewedBlack();
+      });
+      area.prepend(button);
+    }
+    return;
+  }
+}

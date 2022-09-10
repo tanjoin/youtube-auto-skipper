@@ -47,10 +47,12 @@ function viewedBlack() {
     if (localStorage.getItem("tj::" + location.href.split('&')[0].split('=')[1])) { // blacked
       let area = document.querySelector('#super-title');
       let button = document.createElement('button');
-      button.textContent = "✓";
-      button.style.border = undefined;
+      button.textContent = "+";
+      button.style.border = "0";
       button.style.color = "white";
-      button.style.backgroundColor = "black";
+      button.style.marginRight = "6px";
+      button.style.backgroundColor = "#018786";
+      button.style.borderRadius = "10%";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();
@@ -60,10 +62,12 @@ function viewedBlack() {
     } else {
       let area = document.querySelector('#super-title');
       let button = document.createElement('button');
-      button.textContent = "✗";
-      button.style.border = undefined;
+      button.textContent = "×";
+      button.style.border = "0";
       button.style.color = "white";
-      button.style.backgroundColor = "black";
+      button.style.marginRight = "6px";
+      button.style.backgroundColor = "#6200EE";
+      button.style.borderRadius = "10%";
       button.addEventListener("click", () => {
         localStorage.removeItem("tj::" + id, document.title);
         button.remove();
@@ -78,10 +82,12 @@ function viewedBlack() {
     if (localStorage.getItem("tj::" + location.href.split('&')[0].split("shorts/")[1])) { // short blacked
       let area = document.querySelector('#super-title');
       let button = document.createElement('button');
-      button.textContent = "✓";
-      button.style.border = undefined;
+      button.textContent = "+";
+      button.style.border = "0";
       button.style.color = "white";
-      button.style.backgroundColor = "black";
+      button.style.marginRight = "6px";
+      button.style.backgroundColor = "#018786";
+      button.style.borderRadius = "10%";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();
@@ -91,10 +97,12 @@ function viewedBlack() {
     } else {
       let area = document.querySelector('#super-title');
       let button = document.createElement('button');
-      button.textContent = "✗";
-      button.style.border = undefined;
+      button.textContent = "×";
+      button.style.border = "0";
       button.style.color = "white";
-      button.style.backgroundColor = "black";
+      button.style.marginRight = "6px";
+      button.style.backgroundColor = "#6200EE";
+      button.style.borderRadius = "10%";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();

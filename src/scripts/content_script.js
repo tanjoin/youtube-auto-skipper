@@ -15,6 +15,8 @@ function setup() {
     if (ad_count % 3 === 0) {
       skip();
       close();
+    }
+    if (ad_count % 10 === 0) {
       viewedBlack();
     }
   });
@@ -41,14 +43,24 @@ function close() {
   }
 };
 
+let nowUrl = undefined;
 function viewedBlack() {
+  if (nowUrl == location.href) {
+    return;
+  }
+  nowUrl = location.href;
   if (document.querySelector('#viewed_black_main')) {
     document.querySelector('#viewed_black_main').remove();
   }
+  let area = document.querySelector('#super-title');
+  if (!area) {
+    setTimeout(viewedBlack, 3000);
+    return;
+  }
   if (location.href.split('&')[0].split('=')[1]) {
     var id = location.href.split('&')[0].split('=')[1];
-    if (localStorage.getItem("tj::" + location.href.split('&')[0].split('=')[1])) { // blacked
-      let area = document.querySelector('#super-title');
+    if (!localStorage.getItem("tj::" + id)) { // blacked
+      console.log('viewedBlack : ' + localStorage.getItem("tj::" + id));
       let button = document.createElement('button');
       button.textContent = "+";
       button.style.border = "0";
@@ -60,11 +72,12 @@ function viewedBlack() {
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();
+        nowUrl = undefined;
         viewedBlack();
       });
       area.prepend(button);
     } else {
-      let area = document.querySelector('#super-title');
+      console.log('viewedBlack : ' + localStorage.getItem("tj::" + id));
       let button = document.createElement('button');
       button.textContent = "×";
       button.style.border = "0";
@@ -76,6 +89,7 @@ function viewedBlack() {
       button.addEventListener("click", () => {
         localStorage.removeItem("tj::" + id, document.title);
         button.remove();
+        nowUrl = undefined;
         viewedBlack();
       });
       area.prepend(button);
@@ -84,8 +98,7 @@ function viewedBlack() {
   }
   if (location.href.split('&')[0].split("shorts/")[1]) {
     var id = location.href.split('&')[0].split("shorts/")[1];
-    if (localStorage.getItem("tj::" + location.href.split('&')[0].split("shorts/")[1])) { // short blacked
-      let area = document.querySelector('#super-title');
+    if (!localStorage.getItem("tj::" + id)) { // short blacked
       let button = document.createElement('button');
       button.textContent = "+";
       button.style.border = "0";
@@ -97,11 +110,11 @@ function viewedBlack() {
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();
+        nowUrl = undefined;
         viewedBlack();
       });
       area.prepend(button);
     } else {
-      let area = document.querySelector('#super-title');
       let button = document.createElement('button');
       button.textContent = "×";
       button.style.border = "0";
@@ -113,10 +126,10 @@ function viewedBlack() {
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
         button.remove();
+        nowUrl = undefined;
         viewedBlack();
       });
       area.prepend(button);
     }
-    return;
   }
 }

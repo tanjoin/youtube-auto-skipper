@@ -45,18 +45,17 @@ function close() {
 
 let nowUrl = undefined;
 function viewedBlack() {
-  if (nowUrl == location.href) {
+  if (nowUrl == location.href && document.getElementById('viewed_black_main')) {
     return;
   }
-  nowUrl = location.href;
   if (document.querySelector('#viewed_black_main')) {
     document.querySelector('#viewed_black_main').remove();
   }
   let area = document.querySelector('#super-title');
   if (!area) {
-    setTimeout(viewedBlack, 3000);
     return;
   }
+  nowUrl = location.href;
   if (location.href.split('&')[0].split('=')[1]) {
     var id = location.href.split('&')[0].split('=')[1];
     if (!localStorage.getItem("tj::" + id)) { // blacked

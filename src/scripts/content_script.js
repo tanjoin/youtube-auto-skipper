@@ -55,6 +55,7 @@ function viewedBlack() {
   if (!area) {
     return;
   }
+  area.removeAttribute('is-empty');
   nowUrl = location.href;
   if (location.href.split('&')[0].split('=')[1]) {
     var id = location.href.split('&')[0].split('=')[1];

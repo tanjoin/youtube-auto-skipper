@@ -51,7 +51,7 @@ function viewedBlack() {
   if (document.querySelector('#viewed_black_main')) {
     document.querySelector('#viewed_black_main').remove();
   }
-  let area = document.querySelector('#super-title');
+  let area = document.querySelector('#super-title') || document.querySelector('.super-title');
   if (!area) {
     return;
   }

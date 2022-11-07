@@ -11,7 +11,7 @@ chrome.storage.local.get({
 // もともとあった関数を消す
 delete apply;
 function apply(tj_switch_contrast) {
-  [...document.querySelectorAll('ytd-grid-video-renderer')]
+  [...document.querySelectorAll('ytd-grid-video-renderer'), ...document.querySelectorAll('ytd-rich-item-renderer'), ...document.querySelectorAll('ytd-playlist-video-renderer')]
   .forEach((e) => {
     if (e.querySelector('a').href.split('&')[0].split('=')[1] && localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split('=')[1])) {
       e.style.opacity = tj_switch_contrast ? "1.0" : "0.1";

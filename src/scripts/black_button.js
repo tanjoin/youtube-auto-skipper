@@ -85,7 +85,7 @@ function addDarkButton(ygvr) {
     bar.appendChild(progress);
     overlay.appendChild(bar);
   });
-  thumbnail.appendChild(dismiss);
+  thumbnail?.appendChild(dismiss);
 }
 
 function setup() {
@@ -96,7 +96,7 @@ function setup() {
   }
   var observer = new MutationObserver((mutations) => {
     if (black_button_count % 5 === 0) {
-      [...document.querySelectorAll('ytd-grid-video-renderer'), ...document.querySelectorAll('ytd-video-renderer'), ...document.querySelectorAll('ytd-playlist-video-renderer')]
+      [...document.querySelectorAll('ytd-grid-video-renderer'), ...document.querySelectorAll('ytd-video-renderer'), ...document.querySelectorAll('ytd-playlist-video-renderer'), ...document.querySelectorAll('ytd-rich-item-renderer')]
       .filter((e) => {
         return !e.querySelector(".tj-kurakusuru");
       })

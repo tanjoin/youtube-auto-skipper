@@ -51,7 +51,7 @@ function viewedBlack() {
   if (document.querySelector('#viewed_black_main')) {
     document.querySelector('#viewed_black_main').remove();
   }
-  let area = document.querySelector('#super-title') || document.querySelector('.super-title');
+  let area = document.querySelector('#below');
   if (!area) {
     return;
   }
@@ -62,12 +62,13 @@ function viewedBlack() {
     if (!localStorage.getItem("tj::" + id)) { // blacked
       console.log('viewedBlack : ' + localStorage.getItem("tj::" + id));
       let button = document.createElement('button');
-      button.textContent = "+";
+      button.textContent = "+ 未視聴（未取得）";
       button.style.border = "0";
       button.style.color = "white";
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#018786";
-      button.style.borderRadius = "10%";
+      // button.style.borderRadius = "10%";
+      button.style.width = "100%";
       button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
@@ -79,12 +80,13 @@ function viewedBlack() {
     } else {
       console.log('viewedBlack : ' + localStorage.getItem("tj::" + id));
       let button = document.createElement('button');
-      button.textContent = "×";
+      button.textContent = "× 視聴済み（取得済み）";
       button.style.border = "0";
       button.style.color = "white";
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#6200EE";
-      button.style.borderRadius = "10%";
+      // button.style.borderRadius = "10%";
+      button.style.width = "100%";
       button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.removeItem("tj::" + id, document.title);
@@ -100,12 +102,13 @@ function viewedBlack() {
     var id = location.href.split('&')[0].split("shorts/")[1];
     if (!localStorage.getItem("tj::" + id)) { // short blacked
       let button = document.createElement('button');
-      button.textContent = "+";
+      button.textContent = "+ 未視聴（未取得）";
       button.style.border = "0";
       button.style.color = "white";
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#018786";
-      button.style.borderRadius = "10%";
+      // button.style.borderRadius = "10%";
+      button.style.width = "100%";
       button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);
@@ -116,12 +119,13 @@ function viewedBlack() {
       area.prepend(button);
     } else {
       let button = document.createElement('button');
-      button.textContent = "×";
+      button.textContent = "× 視聴済み（取得済み）";
       button.style.border = "0";
       button.style.color = "white";
       button.style.marginRight = "6px";
       button.style.backgroundColor = "#6200EE";
-      button.style.borderRadius = "10%";
+      // button.style.borderRadius = "10%";
+      button.style.width = "100%";
       button.id = "viewed_black_main";
       button.addEventListener("click", () => {
         localStorage.setItem("tj::" + id, document.title);

@@ -38,13 +38,21 @@ function apply(tj_switch_contrast) {
   .forEach((e) => {
     if (e.querySelector('a').href.split('&')[0].split('=')[1] && localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split('=')[1])) {
       if (e.tagName.toLowerCase() === "ytd-playlist-video-renderer") {
-        e.style.opacity = "0.8";
+        if (e.querySelector('#progress')) {
+          e.style.opacity = "0.5";
+        } else {
+          e.style.opacity = "0.7";
+        }
       } else {
         e.style.opacity = "0.1";
       }
     } else if (e.querySelector('a').href.split('&')[0].split("shorts/")[1] && localStorage.getItem("tj::" + e.querySelector('a').href.split('&')[0].split("shorts/")[1])) {
       if (e.tagName.toLowerCase() === "ytd-playlist-video-renderer") {
-        e.style.opacity = "0.8";
+        if (e.querySelector('#progress')) {
+          e.style.opacity = "0.5";
+        } else {
+          e.style.opacity = "0.7";
+        }
       } else {
         e.style.opacity = "0.1";
       }

@@ -7,6 +7,7 @@ var black_button_count = 0;
 
 function addRemoveDarkButton(ygvr) {
   var thumbnail = ygvr.querySelector('#thumbnail');
+  var details = ygvr.querySelector('#details');
   var overlay = ygvr.querySelector('#overlays');
   var dismiss = document.createElement('button');
   dismiss.className = "tj-kurakusuru";
@@ -16,6 +17,7 @@ function addRemoveDarkButton(ygvr) {
   dismiss.style.fontSize = "10px";
   dismiss.style.position = "absolute";
   dismiss.style.bottom = 0;
+  dismiss.style.right = 0;
   dismiss.style.backgroundColor = "white";
   dismiss.style.color = "black";
   dismiss.style.opacity = 1.0;
@@ -41,11 +43,12 @@ function addRemoveDarkButton(ygvr) {
     var bar = overlay.querySelector('.tj-manual-bar');
     bar.remove();
   });
-  thumbnail.appendChild(dismiss);
+  details.appendChild(dismiss);
 }
 
 function addDarkButton(ygvr) {
   var thumbnail = ygvr.querySelector('#thumbnail');
+  var details = ygvr.querySelector('#details');
   var overlay = ygvr.querySelector('#overlays');
   var dismiss = document.createElement('button');
   dismiss.className = "tj-kurakusuru";
@@ -55,6 +58,7 @@ function addDarkButton(ygvr) {
   dismiss.style.fontSize = "10px";
   dismiss.style.position = "absolute";
   dismiss.style.bottom = 0;
+  dismiss.style.right = 0;
   dismiss.style.backgroundColor = "black";
   dismiss.style.color = "white";
   dismiss.addEventListener("click", (e) => { 
@@ -85,7 +89,7 @@ function addDarkButton(ygvr) {
     bar.appendChild(progress);
     overlay.appendChild(bar);
   });
-  thumbnail?.appendChild(dismiss);
+  details?.appendChild(dismiss);
 }
 
 function setup() {

@@ -35,7 +35,9 @@ function setup() {
 
 function apply(tj_switch_contrast) {
   // ショート動画削除
-  [...document.querySelectorAll('div#contents ytd-rich-section-renderer')].filter((d) => d.innerText.includes('ショート')).forEach((d) => d.remove());
+  [...document.querySelectorAll('div#contents ytd-rich-section-renderer')]
+    .filter((d) => d.innerText.includes('ショート'))
+    .forEach((d) => d.style.display = 'none');
   
   [...document.querySelectorAll('ytd-grid-video-renderer'), ...document.querySelectorAll('ytd-rich-item-renderer'), ...document.querySelectorAll('ytd-playlist-video-renderer')]
   .forEach((e) => {

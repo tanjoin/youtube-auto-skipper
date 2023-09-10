@@ -7,6 +7,7 @@ var black_button_count = 0;
 
 function addRemoveDarkButton(ygvr) {
   var thumbnail = ygvr.querySelector('#thumbnail');
+  var meta = ygvr.querySelector('#meta');
   var details = ygvr.querySelector('#details');
   var overlay = ygvr.querySelector('#overlays');
   var dismiss = document.createElement('button');
@@ -43,11 +44,16 @@ function addRemoveDarkButton(ygvr) {
     var bar = overlay.querySelector('.tj-manual-bar');
     bar.remove();
   });
-  details.appendChild(dismiss);
+  details?.appendChild(dismiss);
+  dismiss.style.removeProperty("position");
+  dismiss.style.removeProperty("bottom");
+  dismiss.style.removeProperty("right");
+  meta?.appendChild(dismiss);
 }
 
 function addDarkButton(ygvr) {
   var thumbnail = ygvr.querySelector('#thumbnail');
+  var meta = ygvr.querySelector('#meta');
   var details = ygvr.querySelector('#details');
   var overlay = ygvr.querySelector('#overlays');
   var dismiss = document.createElement('button');
@@ -90,6 +96,10 @@ function addDarkButton(ygvr) {
     overlay.appendChild(bar);
   });
   details?.appendChild(dismiss);
+  dismiss.style.removeProperty("position");
+  dismiss.style.removeProperty("bottom");
+  dismiss.style.removeProperty("right");
+  meta?.appendChild(dismiss);
 }
 
 function setup() {

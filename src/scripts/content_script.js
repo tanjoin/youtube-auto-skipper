@@ -33,6 +33,12 @@ function skip() {
     console.log("YoutubeAutoSkipper skip ads!");
     setTimeout(skip, 500);
   }
+  const button = document.querySelector('.ytp-skip-ad-button');
+  if (button) {
+    button.click();
+    console.log("youtube auto skipper skip ads!");
+    setTimeout(skip, 500);
+  }
 };
 
 function close() {

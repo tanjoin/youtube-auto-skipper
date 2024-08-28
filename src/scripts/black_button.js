@@ -1,16 +1,15 @@
 ((global) => {
-  'use strict';
+  "use strict";
   setup();
 })(this.self || global);
 
 var black_button_count = 0;
 
 function addRemoveDarkButton(ygvr) {
-  var thumbnail = ygvr.querySelector('#thumbnail');
-  var meta = ygvr.querySelector('#meta');
-  var details = ygvr.querySelector('#details');
-  var overlay = ygvr.querySelector('#overlays');
-  var dismiss = document.createElement('button');
+  var meta = ygvr.querySelector("#meta");
+  var details = ygvr.querySelector("#details");
+  var overlay = ygvr.querySelector("#overlays");
+  var dismiss = document.createElement("button");
   dismiss.className = "tj-kurakusuru";
   dismiss.width = "30px";
   dismiss.height = "30px";
@@ -22,26 +21,28 @@ function addRemoveDarkButton(ygvr) {
   dismiss.style.backgroundColor = "white";
   dismiss.style.color = "black";
   dismiss.style.opacity = 1.0;
-  dismiss.addEventListener("click", (e) => { 
+  dismiss.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
     ygvr.style.opacity = "1.0";
-    var a = ygvr.querySelector('a');
+    var a = ygvr.querySelector("a");
     if (a) {
-      var titleView = ygvr.querySelector('#video-title');
+      var titleView = ygvr.querySelector("#video-title");
       var title = true;
       if (titleView) {
         title = titleView.textContent;
       }
-      if (a.href.split('&')[0].split('=')[1]) {
-        localStorage.removeItem('tj::' + a.href.split('&')[0].split('=')[1]);
-      } else if (a.href.split('&')[0].split("shorts/")[1]) {
-        localStorage.removeItem('tj::' + a.href.split('&')[0].split("shorts/")[1]);
+      if (a.href.split("&")[0].split("=")[1]) {
+        localStorage.removeItem("tj::" + a.href.split("&")[0].split("=")[1]);
+      } else if (a.href.split("&")[0].split("shorts/")[1]) {
+        localStorage.removeItem(
+          "tj::" + a.href.split("&")[0].split("shorts/")[1]
+        );
       }
       addDarkButton(ygvr);
       dismiss.remove();
     }
-    var bar = overlay.querySelector('.tj-manual-bar');
+    var bar = overlay.querySelector(".tj-manual-bar");
     bar.remove();
   });
   details?.appendChild(dismiss);
@@ -52,11 +53,10 @@ function addRemoveDarkButton(ygvr) {
 }
 
 function addDarkButton(ygvr) {
-  var thumbnail = ygvr.querySelector('#thumbnail');
-  var meta = ygvr.querySelector('#meta');
-  var details = ygvr.querySelector('#details');
-  var overlay = ygvr.querySelector('#overlays');
-  var dismiss = document.createElement('button');
+  var meta = ygvr.querySelector("#meta");
+  var details = ygvr.querySelector("#details");
+  var overlay = ygvr.querySelector("#overlays");
+  var dismiss = document.createElement("button");
   dismiss.className = "tj-kurakusuru";
   dismiss.width = "30px";
   dismiss.height = "30px";
@@ -67,31 +67,40 @@ function addDarkButton(ygvr) {
   dismiss.style.right = 0;
   dismiss.style.backgroundColor = "black";
   dismiss.style.color = "white";
-  dismiss.addEventListener("click", (e) => { 
+  dismiss.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
     ygvr.style.opacity = "0.1";
-    var a = ygvr.querySelector('a');
+    var a = ygvr.querySelector("a");
     console.log(a);
     if (a) {
-      var titleView = ygvr.querySelector('#video-title');
+      var titleView = ygvr.querySelector("#video-title");
       var title = true;
       if (titleView) {
         title = titleView.textContent;
       }
-      if (a.href.split('&')[0].split('=')[1]) {
-        localStorage.setItem('tj::' + a.href.split('&')[0].split('=')[1], title);
-      } else if (a.href.split('&')[0].split("shorts/")[1]) {
-        localStorage.setItem('tj::' + a.href.split('&')[0].split("shorts/")[1], title);
+      if (a.href.split("&")[0].split("=")[1]) {
+        localStorage.setItem(
+          "tj::" + a.href.split("&")[0].split("=")[1],
+          title
+        );
+      } else if (a.href.split("&")[0].split("shorts/")[1]) {
+        localStorage.setItem(
+          "tj::" + a.href.split("&")[0].split("shorts/")[1],
+          title
+        );
       }
       addRemoveDarkButton(ygvr);
       dismiss.remove();
     }
-    var bar = document.createElement('ytd-thumbnail-overlay-resume-playback-renderer');
+    var bar = document.createElement(
+      "ytd-thumbnail-overlay-resume-playback-renderer"
+    );
     bar.className = "style-scope ytd-thumbnail tj-manual-bar";
-    var progress = document.createElement('div');
+    var progress = document.createElement("div");
     progress.id = "progress";
-    progress.className = "style-scope ytd-thumbnail-overlay-resume-playback-renderer";
+    progress.className =
+      "style-scope ytd-thumbnail-overlay-resume-playback-renderer";
     bar.appendChild(progress);
     overlay.appendChild(bar);
   });
@@ -103,25 +112,30 @@ function addDarkButton(ygvr) {
 }
 
 function setup() {
-  var target = document.querySelector('body');
+  var target = document.querySelector("body");
   if (!target) {
     window.setTimeout(setup, 5000);
     return;
   }
   var observer = new MutationObserver((mutations) => {
     if (black_button_count % 5 === 0) {
-      [...document.querySelectorAll('ytd-grid-video-renderer'), ...document.querySelectorAll('ytd-video-renderer'), ...document.querySelectorAll('ytd-playlist-video-renderer'), ...document.querySelectorAll('ytd-rich-item-renderer')]
-      .filter((e) => {
-        return !e.querySelector(".tj-kurakusuru");
-      })
-      .forEach((ygvr) => {
-        addDarkButton(ygvr);
-      });
+      [
+        ...document.querySelectorAll("ytd-grid-video-renderer"),
+        ...document.querySelectorAll("ytd-video-renderer"),
+        ...document.querySelectorAll("ytd-playlist-video-renderer"),
+        ...document.querySelectorAll("ytd-rich-item-renderer"),
+      ]
+        .filter((e) => {
+          return !e.querySelector(".tj-kurakusuru");
+        })
+        .forEach((ygvr) => {
+          addDarkButton(ygvr);
+        });
     }
     black_button_count++;
   });
   observer.observe(target, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
 }

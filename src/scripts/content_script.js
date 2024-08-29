@@ -42,8 +42,9 @@ function skip() {
     return;
   }
   const previewArea = document.querySelector(".ytp-preview-ad");
+  const timeDuration = document.querySelector(".ytp-time-duration");
   if (previewArea) {
-    let seconds = parseInt(previewArea.textContent);
+    let seconds = parseInt(timeDuration?.textContent?.split(":")[0] * 60 + timeDuration?.textContent?.split(":")[1]);
     if (seconds > 10) {
       let t = document
         ?.querySelector("#time-status")

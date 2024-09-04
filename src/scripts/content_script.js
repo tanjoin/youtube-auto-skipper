@@ -41,39 +41,34 @@ function skip() {
     }
     return;
   }
+  const button = document.querySelector(".ytp-skip-ad-button");
   const previewArea = document.querySelector(".ytp-preview-ad");
   const timeDuration = document.querySelector(".ytp-time-duration");
-  if (previewArea) {
-    let seconds = parseInt(timeDuration?.textContent?.split(":")[0] * 60 + timeDuration?.textContent?.split(":")[1]);
+  if (!button && previewArea) {
+    let seconds = parseInt(
+      timeDuration?.textContent?.split(":")[0] * 60 +
+        timeDuration?.textContent?.split(":")[1]
+    );
     if (seconds > 10) {
-      let t = document
-        ?.querySelector("#time-status")
-        ?.textContent.trim()
-        ?.split(":")
-        ?.reverse()
-        ?.map((t, i) => {
-          t = parseInt(t);
-          if (i == 0) {
-            return t;
-          } else {
-            var tmp = t;
-            for (var j = 0; j < i; j++) {
-              tmp = tmp * 60;
+      let player = document.getElementById("movie_player");
+      if (player && player.getCurrentTime) {
+        let currentTime = player?.getCurrentTime();
+        if (currentTime) {
+          let t = parseInt(currentTime);
+          if (t) {
+            if (location.href.includes("/watch?v=")) {
+              location.href = location.href + "&t=" + t + "s";
             }
-            return tmp;
           }
-        })
-        ?.reduce((c, v) => c + v, 0);
-
-      if (t) {
-        location.href = location.href + "&t=" + t;
+        }
       } else {
-        location.reload();
+        if (location.href.includes("/watch?v=")) {
+          location.reload();
+        }
       }
       return;
     }
   }
-  const button = document.querySelector(".ytp-skip-ad-button");
   if (button) {
     is_skipping = 1;
     let oX = button.getBoundingClientRect().x;

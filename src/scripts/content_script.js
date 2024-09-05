@@ -70,6 +70,7 @@ function skip() {
     }
   }
   if (button) {
+    let is_fullscreen = (document.fullscreenElement != null);
     is_skipping = 1;
     let oX = button.getBoundingClientRect().x;
     let oY = button.getBoundingClientRect().y;
@@ -82,6 +83,9 @@ function skip() {
       is_skipping = 0;
       setTimeout(() => {
         document.querySelector("video").play();
+        if (is_fullscreen && document.fullscreenElement == null) {
+          document.documentElement.requestFullscreen();
+        }
       }, 1000);
     });
   }

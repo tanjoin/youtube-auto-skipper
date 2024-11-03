@@ -5,20 +5,31 @@
 
 var ad_count = 0;
 let is_skipping = 0;
+var oldUrl = '';
+
+window.addEventListener("urlChange", () => {
+  console.log("urlChange");
+  if (location.href.includes("/watch?v=")) {
+    skip();
+    close();
+  }
+});
 
 function setup() {
-  var target = document.querySelector("body");
+  var target = document.body;
   if (!target) {
     window.setTimeout(setup, 500);
     return;
   }
   var observer = new MutationObserver((mutations) => {
-    if (ad_count % 3 === 0) {
-      skip();
-      close();
-    }
+    skip();
+    close();
     if (ad_count % 10 === 0) {
       viewedBlack();
+    }
+    if (oldUrl !== location.href) {
+      oldUrl = location.href;
+      window.dispatchEvent(new Event("urlChange"));
     }
   });
   observer.observe(target, {
@@ -35,13 +46,14 @@ function skip() {
   if (is_skipping > 0) {
     console.log("is skipping");
     if (is_skipping > 10) {
+      setTimeout(() => skip(), 5000);
       is_skipping = 0;
     } else {
       is_skipping++;
     }
     return;
   }
-  const button = document.querySelector(".ytp-skip-ad-button");
+  const button = document.querySelector(".ytp-skip-ad-button, .ytp-ad-skip-button-modern");
   const previewArea = document.querySelector(".ytp-preview-ad");
   const timeDuration = document.querySelector(".ytp-time-duration");
   if (!button && previewArea) {

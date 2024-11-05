@@ -1,141 +1,165 @@
+class VideoGridItem {
+  constructor(element) {
+    this.element = element;
+  }
+
+  get meta() {
+    return this.element.querySelector("#meta");
+  }
+
+  get details() {
+    return this.element.querySelector("#details");
+  }
+
+  get overlay() {
+    return this.element.querySelector("#overlays");
+  }
+
+  get a() {
+    return this.element.querySelector("a");
+  }
+
+  get href() { 
+    return this.a.href;
+  }
+
+  get videoTitle() {
+    return this.element.querySelector("#video-title");
+  }
+
+  get id() {
+    if (this.isShort()) {
+      return this.href.split("shorts/").pop();
+    }
+    return new URLSearchParams(new URL(this.href).search).get("v");
+  }
+
+  isShort() {
+    return this.href.includes("shorts/");
+  }
+
+  createButton(textContent, backgroundColor, color, onClick) {
+    const button = document.createElement("button");
+    button.className = "tj-kurakusuru";
+    button.width = "30px";
+    button.height = "30px";
+    button.textContent = textContent;
+    button.style.fontSize = "10px";
+    button.style.position = "absolute";
+    button.style.bottom = 0;
+    button.style.right = 0;
+    button.style.backgroundColor = backgroundColor;
+    button.style.color = color;
+    button.style.opacity = 1.0;
+    button.addEventListener("click", onClick);
+    this.details?.appendChild(button);
+    button.style.removeProperty("position");
+    button.style.removeProperty("bottom");
+    button.style.removeProperty("right");
+    this.meta?.appendChild(button);
+    return button;
+  }
+
+  createRemoveDarkButton() {
+    this.createButton("取り消す", "white", "black", this.onClickRemoveDark.bind(this));
+  }
+
+  createAddDarkButton() {
+    this.createButton("× 暗くする", "black", "white", this.onClickAddDark.bind(this));
+  }
+
+  removeDark() {
+    localStorage.removeItem("tj::" + this.id);
+  }
+
+  addDark() {
+    localStorage.setItem("tj::" + this.id, this.videoTitle?.textContent);
+  }
+
+  onClickBefore(button) {
+    button.preventDefault();
+    button.stopPropagation();
+  }
+
+  onClickAfter(button) {
+    button?.remove();
+    window.dispatchEvent(new Event("clickViewedBlackButtonTJEvent"));
+  }
+
+  onClickRemoveDark(button) {
+    this.onClickBefore(button);
+    this.element.style.opacity = "1.0";
+    this.removeDark();
+    this.createAddDarkButton();
+    this.onClickAfter(button);
+  }
+
+  onClickAddDark(button) {
+    this.onClickBefore(button);
+    this.element.style.opacity = "0.1";
+    this.addDark();
+    this.createRemoveDarkButton();
+    this.onClickAfter(button);
+  }
+};
+
+class BlackButtonController {
+
+  constructor() {
+    this.movieCount = 0;
+  }
+
+  onLoad() {
+    window.addEventListener('load', this.setup.bind(this));
+    window.addEventListener('movieCountChange', this.updateBlackButton.bind(this));
+  }
+
+  setup() {
+    if (!document.body) {
+      window.setTimeout(this.setup, 5000);
+      return;
+    }
+    let observer = new MutationObserver((mutations) => {
+      if (this.movieCount !== this.getAllVideoGridItems().length) {
+        this.movieCount = this.getAllVideoGridItems().length;
+        window.dispatchEvent(new Event("movieCountChange"));
+      }
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  updateBlackButton() {
+    console.log("updateBlackButton");
+    this.addDarkButton();
+  }
+
+  addDarkButton() {
+    this.getNotDarkedVideoGridItems().forEach((ygvr) => {
+      new VideoGridItem(ygvr).createAddDarkButton();
+    });
+  }
+
+  getNotDarkedVideoGridItems() {
+    return this.getAllVideoGridItems().filter((e) => {
+      return !e.querySelector(".tj-kurakusuru");
+    });
+  }
+
+  getAllVideoGridItems() {
+    return [
+      ...document.querySelectorAll("ytd-grid-video-renderer"),
+      ...document.querySelectorAll("ytd-video-renderer"),
+      ...document.querySelectorAll("ytd-playlist-video-renderer"),
+      ...document.querySelectorAll("ytd-rich-item-renderer"),
+    ];
+  }
+};
+
+
 ((global) => {
   "use strict";
-  setup();
+  new BlackButtonController().onLoad();
 })(this.self || global);
-
-var black_button_count = 0;
-
-function addRemoveDarkButton(ygvr) {
-  var meta = ygvr.querySelector("#meta");
-  var details = ygvr.querySelector("#details");
-  var overlay = ygvr.querySelector("#overlays");
-  var dismiss = document.createElement("button");
-  dismiss.className = "tj-kurakusuru";
-  dismiss.width = "30px";
-  dismiss.height = "30px";
-  dismiss.textContent = "取り消す";
-  dismiss.style.fontSize = "10px";
-  dismiss.style.position = "absolute";
-  dismiss.style.bottom = 0;
-  dismiss.style.right = 0;
-  dismiss.style.backgroundColor = "white";
-  dismiss.style.color = "black";
-  dismiss.style.opacity = 1.0;
-  dismiss.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    ygvr.style.opacity = "1.0";
-    var a = ygvr.querySelector("a");
-    if (a) {
-      var titleView = ygvr.querySelector("#video-title");
-      var title = true;
-      if (titleView) {
-        title = titleView.textContent;
-      }
-      if (a.href.split("&")[0].split("=")[1]) {
-        localStorage.removeItem("tj::" + a.href.split("&")[0].split("=")[1]);
-      } else if (a.href.split("&")[0].split("shorts/")[1]) {
-        localStorage.removeItem(
-          "tj::" + a.href.split("&")[0].split("shorts/")[1]
-        );
-      }
-      addDarkButton(ygvr);
-      dismiss.remove();
-    }
-    var bar = overlay.querySelector(".tj-manual-bar");
-    bar.remove();
-  });
-  details?.appendChild(dismiss);
-  dismiss.style.removeProperty("position");
-  dismiss.style.removeProperty("bottom");
-  dismiss.style.removeProperty("right");
-  meta?.appendChild(dismiss);
-}
-
-function addDarkButton(ygvr) {
-  var meta = ygvr.querySelector("#meta");
-  var details = ygvr.querySelector("#details");
-  var overlay = ygvr.querySelector("#overlays");
-  var dismiss = document.createElement("button");
-  dismiss.className = "tj-kurakusuru";
-  dismiss.width = "30px";
-  dismiss.height = "30px";
-  dismiss.textContent = "× 暗くする";
-  dismiss.style.fontSize = "10px";
-  dismiss.style.position = "absolute";
-  dismiss.style.bottom = 0;
-  dismiss.style.right = 0;
-  dismiss.style.backgroundColor = "black";
-  dismiss.style.color = "white";
-  dismiss.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    ygvr.style.opacity = "0.1";
-    var a = ygvr.querySelector("a");
-    console.log(a);
-    if (a) {
-      var titleView = ygvr.querySelector("#video-title");
-      var title = true;
-      if (titleView) {
-        title = titleView.textContent;
-      }
-      if (a.href.split("&")[0].split("=")[1]) {
-        localStorage.setItem(
-          "tj::" + a.href.split("&")[0].split("=")[1],
-          title
-        );
-      } else if (a.href.split("&")[0].split("shorts/")[1]) {
-        localStorage.setItem(
-          "tj::" + a.href.split("&")[0].split("shorts/")[1],
-          title
-        );
-      }
-      addRemoveDarkButton(ygvr);
-      dismiss.remove();
-    }
-    var bar = document.createElement(
-      "ytd-thumbnail-overlay-resume-playback-renderer"
-    );
-    bar.className = "style-scope ytd-thumbnail tj-manual-bar";
-    var progress = document.createElement("div");
-    progress.id = "progress";
-    progress.className =
-      "style-scope ytd-thumbnail-overlay-resume-playback-renderer";
-    bar.appendChild(progress);
-    overlay.appendChild(bar);
-  });
-  details?.appendChild(dismiss);
-  dismiss.style.removeProperty("position");
-  dismiss.style.removeProperty("bottom");
-  dismiss.style.removeProperty("right");
-  meta?.appendChild(dismiss);
-}
-
-function setup() {
-  var target = document.querySelector("body");
-  if (!target) {
-    window.setTimeout(setup, 5000);
-    return;
-  }
-  var observer = new MutationObserver((mutations) => {
-    if (black_button_count % 5 === 0) {
-      [
-        ...document.querySelectorAll("ytd-grid-video-renderer"),
-        ...document.querySelectorAll("ytd-video-renderer"),
-        ...document.querySelectorAll("ytd-playlist-video-renderer"),
-        ...document.querySelectorAll("ytd-rich-item-renderer"),
-      ]
-        .filter((e) => {
-          return !e.querySelector(".tj-kurakusuru");
-        })
-        .forEach((ygvr) => {
-          addDarkButton(ygvr);
-        });
-    }
-    black_button_count++;
-  });
-  observer.observe(target, {
-    childList: true,
-    subtree: true,
-  });
-}

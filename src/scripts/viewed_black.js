@@ -58,7 +58,17 @@ class VideoItem {
     return "1.0";
   }
 
-  // Apply Methods
+  // Display Methods
+
+  applyNoneDisplay() {
+    this.e.style.display = "none";
+  }
+
+  applyResetDisplay() {
+    this.e.style.display = "";
+  }
+
+  // Opacity Methods
 
   applyViewedBlackOpacity() {
     this.e.style.opacity = this.viewedBlackOpacity();
@@ -78,9 +88,20 @@ class ViewedBlackController {
     this.movieCount = 0;
   }
 
+  static get SWITCH_CONTRAST_TYPE() {
+    return {
+      BLACK: 0,
+      HIDDEN: 1,
+      INVERT: 2,
+      STANDARD: 3
+    };
+  }
+
   onLoad() {
     window.addEventListener("load", this.setup.bind(this));
     window.addEventListener("movieCountChange", this.updateViewedBlackOpacity.bind(this));
+    window.addEventListener("clickActionTJEvent", this.updateViewedBlackOpacity.bind(this));
+    window.addEventListener("clickViewedBlackButtonTJEvent", this.updateViewedBlackOpacity.bind(this));
   }
 
   setup() {
@@ -104,22 +125,54 @@ class ViewedBlackController {
     try {
       chrome.storage.local.get({ tj_switch_contrast: false }, (value) => {
         this.switchContrast = value.tj_switch_contrast;
-        this.applyViewedBlackOpacity(value.tj_switch_contrast);
+        this.applyOpacity();
       });
     } catch (error) {
       console.error(error);
     }
   }
 
-  applyViewedBlackOpacity() {
+  applyOpacity() {
+    console.log(`applyOpacity: ${Object.keys(ViewedBlackController.SWITCH_CONTRAST_TYPE)[this.switchContrast]}`);
     this.getAllMovies().forEach((e) => {
       let videoItem = new VideoItem(e);
-      if (videoItem.isViewedBlack()) {
-        videoItem.applyViewedBlackOpacity();
-      } else if (videoItem.isProgress()) {
-        videoItem.applyProgressOpacity();
-      } else {
-        videoItem.applyResetOpacity();
+      switch(this.switchContrast) {
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.BLACK:
+          if (videoItem.isViewedBlack()) {
+            videoItem.applyViewedBlackOpacity();
+          } else {
+            if (videoItem.isProgress()) {
+              videoItem.applyProgressOpacity();
+            } else {
+              videoItem.applyResetOpacity();
+            }
+          }
+          videoItem.applyResetDisplay();
+          break;
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.HIDDEN:
+          videoItem.applyResetOpacity();
+          if (videoItem.isViewedBlack()) {
+            videoItem.applyNoneDisplay();
+          } else {
+            videoItem.applyResetDisplay();
+          }
+          break;
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.INVERT:
+          if (videoItem.isViewedBlack()) {
+            if (videoItem.isProgress()) {
+              videoItem.applyProgressOpacity();
+            } else {
+              videoItem.applyResetOpacity();
+            }
+          } else {
+            videoItem.applyViewedBlackOpacity();
+          }
+          videoItem.applyResetDisplay();
+          break;
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.STANDARD:
+          videoItem.applyResetOpacity();
+          videoItem.applyResetDisplay();
+          break;
       }
     });
   }

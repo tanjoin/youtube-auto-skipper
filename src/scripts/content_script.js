@@ -1,30 +1,30 @@
 class ViewedBlackSwitchLargeButton {
-  constructor(e) {
-    if (e) {
-      this.e = e;
+  constructor(element) {
+    if (element) {
+      this.element = element;
     } else {
-      this.e = document.createElement("button");
-      this.e.style.border = "0";
-      this.e.style.color = "white";
-      this.e.style.marginRight = "6px";
-      this.e.style.width = "100%";
-      this.e.id = "viewed_black_main";
+      this.element = document.createElement("button");
+      this.element.style.border = "0";
+      this.element.style.color = "white";
+      this.element.style.marginRight = "6px";
+      this.element.style.width = "100%";
+      this.element.id = "viewed_black_main";
     }
   }
 
   toElement() {
-    return this.e;
+    return this.element;
   }
 
   apply(textContent, backgroundColor, onClick) {
-    this.e.textContent = textContent;
-    this.e.style.backgroundColor = backgroundColor;
-    this.e.addEventListener("click", onClick);
+    this.element.textContent = textContent;
+    this.element.style.backgroundColor = backgroundColor;
+    this.element.addEventListener("click", onClick);
   }
 
   applyAlready(clickHandler) {
     this.apply(`× 視聴済み（取得済み）`, "#6200EE", () => {
-      this.e.remove();
+      this.element.remove();
       clickHandler();
     });
     return this;
@@ -32,7 +32,7 @@ class ViewedBlackSwitchLargeButton {
 
   applyNotWatched(clickHandler) {
     this.apply(`+ 未視聴（未取得）`, "#018786", () => {
-      this.e.remove();
+      this.element.remove();
       clickHandler();
     });
     return this;
@@ -354,6 +354,7 @@ class ContentScriptController {
     this.dismissAdController.onLoad();
     this.showViewedBlackLargeButtonController.onLoad();
     this.deleteShortAreaController.onLoad();
+    this.updateIcon();
   }
 
   setup() {
@@ -380,6 +381,10 @@ class ContentScriptController {
   onUrlDidChangedToWatch() {
     this.showViewedBlackLargeButtonController.urlChange();
     this.dismissAdController.urlChange();
+  }
+
+  updateIcon() {
+    chrome.runtime.sendMessage({ action: "icon" });
   }
 };
 

@@ -31,6 +31,13 @@
         chrome.debugger.detach({ tabId: sender.tab.id });
         sendResponse({ x: xC, y: yC });
       });
+    } else if (request.action === "icon") {
+      chrome.storage.local.get({
+        tj_switch_contrast: 0
+      }, (value) => {
+        chrome.action.setBadgeText({ text: ["黒", "隠", "逆", "正"][value.tj_switch_contrast] });
+        chrome.action.setBadgeBackgroundColor({ color: ["#000000", "#008000", "#0000FF", "#FFFFFF"][value.tj_switch_contrast] });
+      });
     } else {
       chrome.action.show(sender.tab.id);
       sendResponse({});
@@ -38,9 +45,20 @@
   });
 
   chrome.action.onClicked.addListener((tab) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ["scripts/action.js"],
+    chrome.storage.local.get({
+      tj_switch_contrast: 0
+    }, (value) => {
+      let newValue = (value.tj_switch_contrast + 1) % 4;
+      chrome.storage.local.set({
+        tj_switch_contrast: newValue
+      }, () => {
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => window.dispatchEvent(new Event("clickActionTJEvent"))
+        });
+        chrome.action.setBadgeText({ text: ["黒", "隠", "逆", "正"][newValue] });
+        chrome.action.setBadgeBackgroundColor({ color: ["#000000", "#008000", "#0000FF", "#FFFFFF"][newValue] });
+      });
     });
   });
 })(this.self || global);

@@ -154,6 +154,11 @@ class ViewedBlackController {
           if (videoItem.isViewedBlack()) {
             videoItem.applyNoneDisplay();
           } else {
+            if (videoItem.isProgress()) {
+              videoItem.applyProgressOpacity();
+            } else {
+              videoItem.applyResetOpacity();
+            }
             videoItem.applyResetDisplay();
           }
           break;

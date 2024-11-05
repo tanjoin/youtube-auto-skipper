@@ -81,8 +81,8 @@ class VideoGridItem {
     button.stopPropagation();
   }
 
-  onClickAfter(button) {
-    button?.remove();
+  onClickAfter(event) {
+    event.target.remove();
     window.dispatchEvent(new Event("clickViewedBlackButtonTJEvent"));
   }
 

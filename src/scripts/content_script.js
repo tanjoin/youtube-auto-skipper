@@ -58,6 +58,7 @@ class DeleteShortAreaController {
 
   // ショート動画削除
   deleteShortArea() {
+    console.log(`DeleteShortAreaController.deleteShortArea`);
     this.getShortArea()
       .filter((d) => !d.innerText.includes("新しい順"))
       .forEach((d) => (d.style.display = "none"));
@@ -72,6 +73,7 @@ class DeleteShortAreaController {
 
 class DismissAdController {
   constructor() {
+    this.isRunning = false;
   }
 
   onLoad() {
@@ -154,18 +156,24 @@ class DismissAdController {
         if (isFullscreen && document.fullscreenElement == null) {
           document.documentElement.requestFullscreen();
         }
+        ReloadConfirmDialog.clear();
+        this.isRunning = false;
       }, 1000);
     });
   }
 
   performSkipAction() {
+    if (this.isRunning) {
+      return;
+    }
+    this.isRunning = true;
+    console.log(`DismissAdController.performSkipAction`);
     const button = this.getSkipButton();
     if (button) {
       button.style.display = "";
       this.performSkip(button);
       return;
     }
-
     const adInterruptingElement = this.getAdInterruptingElement();
     const timeDuration = this.getTimeDuration();
     if (adInterruptingElement && timeDuration) {
@@ -176,23 +184,98 @@ class DismissAdController {
       let isFullscreen = document.fullscreenElement != null;
       if (seconds > 10) {
         this.checkCurrentTime();
+        let params = new URLSearchParams(location.search);
+        if (isFullscreen) {
+          params.set("fullscreen", true);
+        }
         if (this.currentTime > 0) {
-          let params = new URLSearchParams(location.search);
           params.set("t", this.currentTime);
-          if (isFullscreen) {
-            params.set("fullscreen", true);
-          }
           location.search = params.toString();
         } else {
-          let params = new URLSearchParams(location.search);
-          if (isFullscreen) {
-            params.set("fullscreen", true);
-          }
-          location.search = params.toString();
-          location.reload();
+          ReloadConfirmDialog.clear();
+          new ReloadConfirmDialog();
         }
       }
     }
+    setTimeout(() => this.isRunning = false, 1000);
+  }
+};
+
+class ReloadConfirmDialog {
+  constructor(e) {
+    if (e) {
+      this.element = e;
+    } else {
+      this.element = document.createElement("div");
+      this.element.id = "tj_reload_confirm_dialog";
+      this.element.style.position = "fixed";
+      this.element.style.zIndex = "10000";
+      this.element.style.top = "0";
+      this.element.style.left = "0";
+      this.element.style.width = "20%";
+      this.element.style.height = "20%";
+      this.element.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+      this.element.style.color = "white";
+      this.element.style.fontSize = "24px";
+      this.element.style.fontWeight = "bold";
+      this.element.style.cursor = "pointer";
+      this.element.style.inset = "0";
+      this.element.style.margin = "auto";
+      this.element.style.borderRadius = "8px";
+      this.element.style.border = "1px solid white";
+
+      let message = document.createElement("div");
+      message.textContent = "リロードしますか？";
+      message.style.padding = "16px";
+      message.style.margin = "16px";
+      message.style.textAlign = "center";
+      this.element.appendChild(message);
+
+      let buttons = document.createElement("div");
+      buttons.style.display = "flex";
+      buttons.style.justifyContent = "center";
+      buttons.style.alignItems = "center";
+      buttons.style.flexDirection = "row";
+      this.element.appendChild(buttons);
+
+      let yes = document.createElement("button");
+      yes.textContent = "はい";
+      yes.style.backgroundColor = "green";
+      yes.style.color = "white";
+      yes.style.padding = "8px";
+      yes.style.margin = "8px";
+      yes.style.border = "0";
+      yes.style.cursor = "pointer";
+      yes.addEventListener("click", () => {
+        console.log(`ReloadConfirmDialog.yes.click`);
+        location.reload();
+      });
+      buttons.appendChild(yes);
+
+      let no = document.createElement("button");
+      no.textContent = "いいえ";
+      no.style.backgroundColor = "red";
+      no.style.color = "white";
+      no.style.padding = "8px";
+      no.style.margin = "8px";
+      no.style.border = "0";
+      no.style.cursor = "pointer";
+      no.addEventListener("click", () => {
+        console.log(`ReloadConfirmDialog.no.click`);
+        this.hide();
+      });
+      buttons.appendChild(no);
+      document.body.appendChild(this.element);
+    }
+  }
+
+  static clear() {
+    document.querySelector('#tj_reload_confirm_dialog')?.remove();
+  }
+
+  hide() {
+    this.element.style.display = "none";
+    this.element.remove();
   }
 };
 
@@ -286,6 +369,7 @@ class ShowViewedBlackLargeButtonController {
   }
 
   viewedBlack() {
+    console.log(`ShowViewedBlackLargeButtonController.viewedBlack`);
     if (this.getViewedBlackMain()) {
       this.getViewedBlackMain().remove();
     }
@@ -332,6 +416,7 @@ class UrlChangeController {
   }
 
   urlChange() {
+    console.log(`UrlChangeController.urlChange`);
     if (location.href.includes("/watch?v=") && this.onUrlDidChangedToWatch) {
       this.onUrlDidChangedToWatch();
     }
@@ -358,6 +443,7 @@ class ContentScriptController {
   }
 
   setup() {
+    console.log(`ContentScriptController.setup`);
     if (!document.body) {
       window.setTimeout(this.setup.bind(this), 500);
       return;

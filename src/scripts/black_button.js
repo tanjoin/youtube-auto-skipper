@@ -87,6 +87,7 @@ class VideoGridItem {
   }
 
   onClickRemoveDark(button) {
+    console.log(`VideoGridItem.onClickRemoveDark`);
     this.onClickBefore(button);
     this.element.style.opacity = "1.0";
     this.removeDark();
@@ -95,6 +96,7 @@ class VideoGridItem {
   }
 
   onClickAddDark(button) {
+    console.log(`VideoGridItem.onClickAddDark`);
     this.onClickBefore(button);
     this.element.style.opacity = "0.1";
     this.addDark();
@@ -115,6 +117,7 @@ class BlackButtonController {
   }
 
   setup() {
+    console.log(`BlackButtonController.setup`);
     if (!document.body) {
       window.setTimeout(this.setup, 5000);
       return;
@@ -132,7 +135,7 @@ class BlackButtonController {
   }
 
   updateBlackButton() {
-    console.log("updateBlackButton");
+    console.log(`BlackButtonController.updateBlackButton`);
     this.addDarkButton();
   }
 

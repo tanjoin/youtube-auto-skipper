@@ -105,6 +105,7 @@ class ViewedBlackController {
   }
 
   setup() {
+    console.log(`ViewedBlackController.setup`);
     if (!document.body) {
       window.setTimeout(this.setup, 5000);
       return;
@@ -122,6 +123,7 @@ class ViewedBlackController {
   }
 
   updateViewedBlackOpacity() {
+    console.log(`ViewedBlackController.updateViewedBlackOpacity`);
     try {
       chrome.storage.local.get({ tj_switch_contrast: false }, (value) => {
         this.switchContrast = value.tj_switch_contrast;

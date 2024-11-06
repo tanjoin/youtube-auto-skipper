@@ -286,6 +286,7 @@ class ShowViewedBlackLargeButtonController {
 
   onLoad() {
     window.addEventListener("showBelow", this.viewedBlack.bind(this));
+    window.addEventListener("tabActivatedTJEvent", this.viewedBlack.bind(this));
   }
   
   observe() {

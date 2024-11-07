@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "YoutubeAutoSkipper",
   "description": "I will see advertisements, but let me skip quickly.",
-  "version": "2024.11.7",
+  "version": "2024.11.8",
   "icons": {
     "16": "icons/16.png",
     "48": "icons/48.png",

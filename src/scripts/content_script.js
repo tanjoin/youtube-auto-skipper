@@ -206,46 +206,58 @@ class ReloadConfirmDialog {
     if (e) {
       this.element = e;
     } else {
+      this.addFadeInAnimation();
+      this.addFadeOutAnimation();
       this.element = document.createElement("div");
       this.element.id = "tj_reload_confirm_dialog";
       this.element.style.position = "fixed";
       this.element.style.zIndex = "10000";
       this.element.style.top = "0";
       this.element.style.left = "0";
-      this.element.style.width = "20%";
-      this.element.style.height = "20%";
-      this.element.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-      this.element.style.color = "white";
-      this.element.style.fontSize = "24px";
+      this.element.style.width = "100%";
+      this.element.style.height = "56px";
+      this.element.style.backgroundColor = "rgb(207, 226, 255)";
+      this.element.style.color = "rgb(5, 44, 101)";
+      this.element.style.fontSize = "16px";
       this.element.style.fontWeight = "bold";
       this.element.style.cursor = "pointer";
-      this.element.style.inset = "0";
-      this.element.style.margin = "auto";
-      this.element.style.borderRadius = "8px";
-      this.element.style.border = "1px solid white";
+      this.element.style.border = "1px solid rgb(158, 197, 254)";
+      this.element.style.borderRadius = "6px";
+      this.element.style.animation = "tj_reload_confirm_dialog_animation_fadein 0.5s";
+
+      let flexBox = document.createElement("div");
+      flexBox.style.display = "flex";
+      flexBox.style.justifyContent = "center";
+      flexBox.style.alignItems = "center";
+      flexBox.style.height = "100%";
+      this.element.appendChild(flexBox);
 
       let message = document.createElement("div");
       message.textContent = "リロードしますか？";
-      message.style.padding = "16px";
-      message.style.margin = "16px";
       message.style.textAlign = "center";
-      this.element.appendChild(message);
+      message.style.paddingLeft = "12px";
+      flexBox.appendChild(message);
 
       let buttons = document.createElement("div");
       buttons.style.display = "flex";
-      buttons.style.justifyContent = "center";
+      buttons.style.justifyContent = "end";
       buttons.style.alignItems = "center";
       buttons.style.flexDirection = "row";
-      this.element.appendChild(buttons);
+      buttons.style.marginLeft = "auto";
+      buttons.style.paddingRight = "12px";
+      buttons.style.height = "100%";
+      flexBox.appendChild(buttons);
 
       let yes = document.createElement("button");
       yes.textContent = "はい";
-      yes.style.backgroundColor = "green";
-      yes.style.color = "white";
-      yes.style.padding = "8px";
-      yes.style.margin = "8px";
+      yes.style.backgroundColor = "rgb(207, 226, 255)";
+      yes.style.color = "rgb(5, 44, 101)";
       yes.style.border = "0";
+      yes.style.padding = "6px";
       yes.style.cursor = "pointer";
+      yes.style.height = "100%";
+      yes.style.minWidth = "100px";
+      yes.style.fontSize = "16px";
       yes.addEventListener("click", () => {
         console.log(`ReloadConfirmDialog.yes.click`);
         location.reload();
@@ -254,12 +266,14 @@ class ReloadConfirmDialog {
 
       let no = document.createElement("button");
       no.textContent = "いいえ";
-      no.style.backgroundColor = "red";
-      no.style.color = "white";
-      no.style.padding = "8px";
-      no.style.margin = "8px";
+      no.style.backgroundColor = "rgb(207, 226, 255)";
+      no.style.color = "rgb(5, 44, 101)";
       no.style.border = "0";
+      no.style.padding = "6px";
       no.style.cursor = "pointer";
+      no.style.height = "100%";
+      no.style.minWidth = "100px";
+      no.style.fontSize = "16px";
       no.addEventListener("click", () => {
         console.log(`ReloadConfirmDialog.no.click`);
         this.hide();
@@ -273,9 +287,43 @@ class ReloadConfirmDialog {
     document.querySelector('#tj_reload_confirm_dialog')?.remove();
   }
 
+  addFadeInAnimation() {
+    if (document.getElementById("tj_reload_confirm_dialog_animation_fadein")) {
+      return;
+    }
+    let style = document.createElement("style");
+    style.id = "tj_reload_confirm_dialog_animation_fadein";
+    document.head.appendChild(style);
+    style.sheet.insertRule(
+      `@keyframes tj_reload_confirm_dialog_animation_fadein {
+        from { transform: translateY(-56px); }
+        to   { transform: translateY(0); }
+      }`
+    );
+  }
+
+  addFadeOutAnimation() {
+    if (document.getElementById("tj_reload_confirm_dialog_animation_fadeout")) {
+      return;
+    }
+    let style = document.createElement("style");
+    style.id = "tj_reload_confirm_dialog_animation_fadeout";
+    document.head.appendChild(style);
+    style.sheet.insertRule(
+      `@keyframes tj_reload_confirm_dialog_animation_fadeout {
+        from { transform: translateY(0); }
+        to   { transform: translateY(-56px); }
+      }`
+    );
+  }
+
   hide() {
-    this.element.style.display = "none";
-    this.element.remove();
+    this.element.style.animationFillMode = "both";
+    this.element.style.animation = "tj_reload_confirm_dialog_animation_fadeout 0.5s";
+    this.element.addEventListener("animationend", () => {
+      this.element.style.display = "none";
+      this.element.remove();
+    });
   }
 };
 

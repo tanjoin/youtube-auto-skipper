@@ -62,9 +62,13 @@
     });
   });
   chrome.tabs.onActivated.addListener((activeInfo) => {
-    chrome.scripting.executeScript({
-      target: { tabId: activeInfo.tabId },
-      func: () => window.dispatchEvent(new Event("tabActivatedTJEvent"))
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+      if (tab.url.startsWith("https://www.youtube.com/")) {
+        chrome.scripting.executeScript({
+          target: { tabId: activeInfo.tabId },
+          func: () => window.dispatchEvent(new Event("tabActivatedTJEvent"))
+        });
+      }
     });
   });
 })(this.self || global);

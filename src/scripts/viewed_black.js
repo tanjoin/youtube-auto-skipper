@@ -107,7 +107,7 @@ class ViewedBlackController {
   setup() {
     console.log(`ViewedBlackController.setup`);
     if (!document.body) {
-      window.setTimeout(this.setup, 5000);
+      window.setTimeout(this.setup.bind(this), 5000);
       return;
     }
     let observer = new MutationObserver((mutations) => {
@@ -130,7 +130,6 @@ class ViewedBlackController {
         this.applyOpacity();
       });
     } catch (error) {
-      console.error(error);
     }
   }
 

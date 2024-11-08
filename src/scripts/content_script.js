@@ -121,12 +121,13 @@ class DismissAdController {
   // Methods
 
   checkCurrentTime() {
+    console.log(`DismissAdController.checkCurrentTime`);
     if (!this.isVideoPage()) {
       this.currentTime = 0;
       return;
     }
     const timeCurrent = this.getTimeCurrent();
-    if (timeCurrent) {
+    if (!timeCurrent) {
       this.currentTime = 0;
       return;
     }
@@ -138,7 +139,11 @@ class DismissAdController {
   }
 
   runtimeAdSkip(x, y, callback) {
-    chrome.runtime.sendMessage({ action: "skip", x, y }, callback);
+    try {
+      chrome.runtime?.sendMessage({ action: "skip", x, y }, callback);
+    } catch (e) {
+      console.log(`DismissAdController.runtimeAdSkip: ${e}`);
+    }
   }
 
   performSkip(button) {
@@ -148,6 +153,7 @@ class DismissAdController {
     if (oX <= 0 || oY <= 0) {
       is_skipping = 0;
       setTimeout(this.performSkipAction.bind(this), 5000);
+      console.log(`DismissAdController.performSkip: skip button not found`);
       return;
     }
     this.runtimeAdSkip(oX, oY, (response) => {
@@ -172,6 +178,7 @@ class DismissAdController {
     if (button) {
       button.style.display = "";
       this.performSkip(button);
+      console.log(`DismissAdController.performSkipAction: skip button found`);
       return;
     }
     const adInterruptingElement = this.getAdInterruptingElement();
@@ -182,22 +189,34 @@ class DismissAdController {
           timeDuration?.textContent?.split(":")[1]
       );
       let isFullscreen = document.fullscreenElement != null;
+      console.log(`DismissAdController.performSkipAction: ${seconds} seconds`);
       if (seconds > 10) {
         this.checkCurrentTime();
         let params = new URLSearchParams(location.search);
         if (isFullscreen) {
           params.set("fullscreen", true);
         }
+        console.log(`DismissAdController.performSkipAction: currentTime -> ${this.currentTime} seconds`);
         if (this.currentTime > 0) {
+          console.log(`DismissAdController.performSkipAction: skip to ${this.currentTime} seconds`);
           params.set("t", this.currentTime);
           location.search = params.toString();
         } else {
-          ReloadConfirmDialog.clear();
-          new ReloadConfirmDialog();
+          this.showReloadConfirmation();
         }
       }
     }
+    console.log(`DismissAdController.performSkipAction: skip button not found`);
     setTimeout(() => this.isRunning = false, 1000);
+  }
+
+  showReloadConfirmation() {
+    console.log(`DismissAdController.showReloadConfirmation`);
+    if (ReloadConfirmDialog.isExist()) {
+      return;
+    }
+    ReloadConfirmDialog.clear();
+    new ReloadConfirmDialog();
   }
 };
 
@@ -281,6 +300,10 @@ class ReloadConfirmDialog {
       buttons.appendChild(no);
       document.body.appendChild(this.element);
     }
+  }
+
+  static isExist() { 
+    return document.querySelector('#tj_reload_confirm_dialog') ? true : false;
   }
 
   static clear() {

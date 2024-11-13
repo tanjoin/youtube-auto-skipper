@@ -78,11 +78,14 @@ class DismissAdController {
 
   onLoad() {
     window.addEventListener("showAd", this.performSkipAction.bind(this));
+    window.addEventListener("hideAd", this.dismissReloadConfirmDialog.bind(this));
   }
 
   observe() {
     if (this.getAdInterruptingElement()) {
       window.dispatchEvent(new Event("showAd"));
+    } else if (ReloadConfirmDialog.isExist()) {
+      window.dispatchEvent(new Event("hideAd"));
     }
   }
 
@@ -217,6 +220,10 @@ class DismissAdController {
     }
     ReloadConfirmDialog.clear();
     new ReloadConfirmDialog();
+  }
+
+  dismissReloadConfirmDialog() {
+    ReloadConfirmDialog.clear();
   }
 };
 

@@ -4,7 +4,7 @@ class VideoGridItem {
   }
 
   get meta() {
-    return this.element.querySelector("#meta");
+    return this.element.querySelector("#meta") || this.element.querySelector('[class$="__metadata"]');
   }
 
   get details() {
@@ -56,7 +56,11 @@ class VideoGridItem {
     button.style.removeProperty("position");
     button.style.removeProperty("bottom");
     button.style.removeProperty("right");
-    this.meta?.appendChild(button);
+    if (this.meta?.className.includes("__metadata")) {
+      this.meta?.parentElement.appendChild(button);
+    } else {
+      this.meta?.appendChild(button);
+    }
     return button;
   }
 

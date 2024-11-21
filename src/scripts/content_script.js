@@ -476,11 +476,7 @@ class ShowViewedBlackLargeButtonController {
       return;
     }
     below.removeAttribute("is-empty");
-    if (this.isSavedBlack()) {
-      below.prepend(this.createAlreadyWatchedViewedBlackButton(this.getVideoId()));
-    } else {
-      below.prepend(this.createNotWatchedViewedBlackButton(this.getVideoId()));
-    }
+    
     // shorts
     if (this.isShorts()) {
       if (this.isShortSavedBlack()) {
@@ -488,6 +484,7 @@ class ShowViewedBlackLargeButtonController {
       } else {
         below.prepend(this.createNotWatchedViewedBlackButton(this.getShortVideoId()));
       }
+      return;
     }
     // live
     if (this.isLive()) {
@@ -496,6 +493,13 @@ class ShowViewedBlackLargeButtonController {
       } else {
         below.prepend(this.createNotWatchedViewedBlackButton(this.getLiveChatId()));
       }
+      return;
+    }
+
+    if (this.isSavedBlack()) {
+      below.prepend(this.createAlreadyWatchedViewedBlackButton(this.getVideoId()));
+    } else {
+      below.prepend(this.createNotWatchedViewedBlackButton(this.getVideoId()));
     }
   }
 };

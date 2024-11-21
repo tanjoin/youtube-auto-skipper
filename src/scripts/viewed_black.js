@@ -13,6 +13,9 @@ class VideoItem {
     if (this.isShort()) {
       return this.href.split("shorts/").pop();
     }
+    if (this.isLive()) {
+      return this.href.split("live/").pop();
+    }
     return new URLSearchParams(new URL(this.href).search).get("v");
   }
 
@@ -24,6 +27,10 @@ class VideoItem {
 
   isProgress() {
     return this.e.querySelector("#progress") !== null;
+  }
+
+  isLive() {
+    return this.href.includes('live/');
   }
 
   isShort() {

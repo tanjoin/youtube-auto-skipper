@@ -31,7 +31,14 @@ class VideoGridItem {
     if (this.isShort()) {
       return this.href.split("shorts/").pop();
     }
+    if (this.isLive()) {
+      return this.href.split("live/").pop();
+    }
     return new URLSearchParams(new URL(this.href).search).get("v");
+  }
+
+  isLive() {
+    return this.href.includes('live/');
   }
 
   isShort() {

@@ -394,6 +394,13 @@ class ShowViewedBlackLargeButtonController {
     return params.get("v");
   }
 
+  getLiveChatId() {
+    if (!this.isLive()) {
+      return null;
+    }
+    return location.pathname.split("live/").pop();
+  }
+
   getShortVideoId() {
     if (!this.isShorts()) {
       return null;
@@ -411,8 +418,20 @@ class ShowViewedBlackLargeButtonController {
     return localStorage.getItem("tj::" + videoId);
   }
 
+  isLive() {
+    return location.pathname.includes('live/');
+  }
+
   isShorts() {
     return location.pathname.includes("shorts/");
+  }
+
+  isLiveSavedBlack() {
+    let liveChatId = this.getLiveChatId();
+    if (!liveChatId) {
+      return false;
+    }
+    return localStorage.getItem("tj::" + liveChatId);
   }
 
   isShortSavedBlack() {
@@ -468,6 +487,14 @@ class ShowViewedBlackLargeButtonController {
         below.prepend(this.createAlreadyWatchedViewedBlackButton(this.getShortVideoId()));
       } else {
         below.prepend(this.createNotWatchedViewedBlackButton(this.getShortVideoId()));
+      }
+    }
+    // live
+    if (this.isLive()) {
+      if (this.isLiveSavedBlack()) {
+        below.prepend(this.createAlreadyWatchedViewedBlackButton(this.getLiveChatId()));
+      } else {
+        below.prepend(this.createNotWatchedViewedBlackButton(this.getLiveChatId()));
       }
     }
   }

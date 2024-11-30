@@ -37,6 +37,10 @@ class VideoGridItem {
     return new URLSearchParams(new URL(this.href).search).get("v");
   }
 
+  isDark() {
+    return localStorage.getItem("tj::" + this.id) !== null;
+  }
+
   isLive() {
     return this.href.includes('live/');
   }
@@ -77,6 +81,14 @@ class VideoGridItem {
 
   createAddDarkButton() {
     this.createButton("× 暗くする", "black", "white", this.onClickAddDark.bind(this));
+  }
+
+  applyDarkButton() {
+    if (this.isDark()) {
+      this.createRemoveDarkButton();
+    } else {
+      this.createAddDarkButton();
+    } 
   }
 
   removeDark() {
@@ -152,7 +164,7 @@ class BlackButtonController {
 
   addDarkButton() {
     this.getNotDarkedVideoGridItems().forEach((ygvr) => {
-      new VideoGridItem(ygvr).createAddDarkButton();
+      new VideoGridItem(ygvr).applyDarkButton();
     });
   }
 

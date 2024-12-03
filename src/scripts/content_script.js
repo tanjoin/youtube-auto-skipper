@@ -533,6 +533,47 @@ class UrlChangeController {
   }
 }
 
+class SkipMembersOnlyController {
+
+  isMembersOnly() {
+    return document.querySelector('#movie_player').textContent.includes('メンバー限定コンテンツ');
+  }
+
+  getPlaylistPanels() {
+    return [...document.querySelectorAll('ytd-playlist-panel-video-renderer')];
+  }
+
+  getCurrentPlaylistPanel() {
+    return this.getPlaylistPanels()
+        .find((panel) => this.extractSpanFromPlaylistPanel(panel).textContent.includes('▶'));
+  }
+
+  extractSpanFromPlaylistPanel(panel) {
+    return panel.querySelector('span#index.style-scope.ytd-playlist-panel-video-renderer');
+  }
+
+  skip({ isVerifyLater }) {
+    console.log(`SkipMembersOnlyController.skip`);
+    if (this.isMembersOnly()) {
+        const result = this.getCurrentPlaylistPanel();
+        if (result) { 
+          location.href = result.nextElementSibling.querySelector('a').href;
+        }
+    }
+    if (isVerifyLater) {
+      this.onUrlDidChangedToWatchAfter10();
+    }
+  }
+
+  onUrlDidChangedToWatchAfter10() {
+    setTimeout(() => {
+      this.skip({
+        isVerifyLater: document.querySelector('ytd-playlist-panel-renderer.ytd-watch-flexy') === null
+      });
+    }, 10000);
+  }
+}
+
 class ContentScriptController {
   constructor() {
     this.oldUrl = "";
@@ -540,6 +581,7 @@ class ContentScriptController {
     this.showViewedBlackLargeButtonController = new ShowViewedBlackLargeButtonController();
     this.deleteShortAreaController = new DeleteShortAreaController();
     this.dismissAdController = new DismissAdController();
+    this.skipMembersOnlyController = new SkipMembersOnlyController();
   }
 
   onLoad() {
@@ -577,6 +619,7 @@ class ContentScriptController {
   onUrlDidChangedToWatch() {
     this.showViewedBlackLargeButtonController.urlChange();
     this.dismissAdController.urlChange();
+    this.skipMembersOnlyController.skip({ isVerifyLater: true });
   }
 
   updateIcon() {

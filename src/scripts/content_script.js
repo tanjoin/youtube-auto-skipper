@@ -66,7 +66,7 @@ class DeleteShortAreaController {
 
   getShortArea() {
     return [
-      ...document.querySelectorAll("div#contents ytd-rich-section-renderer"),
+      ...document.querySelectorAll("div#contents ytd-rich-section-renderer, div#contents ytd-reel-shelf-renderer"),
     ];
   }
 };

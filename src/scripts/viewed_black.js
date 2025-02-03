@@ -100,7 +100,8 @@ class ViewedBlackController {
       BLACK: 0,
       HIDDEN: 1,
       INVERT: 2,
-      STANDARD: 3
+      STANDARD: 3,
+      SHORT_HIDDEN: 4,
     };
   }
 
@@ -186,6 +187,14 @@ class ViewedBlackController {
           videoItem.applyResetOpacity();
           videoItem.applyResetDisplay();
           break;
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SHORT_HIDDEN:
+          if (videoItem.isShort()) {
+            videoItem.applyNoneDisplay();
+          } else {
+            videoItem.applyResetOpacity();
+            videoItem.applyResetDisplay();
+          }
+          break;
       }
     });
   }
@@ -195,6 +204,7 @@ class ViewedBlackController {
       ...document.querySelectorAll("ytd-grid-video-renderer"),
       ...document.querySelectorAll("ytd-rich-item-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
+      ...document.querySelectorAll("ytd-video-renderer"),
     ];
   }
 };

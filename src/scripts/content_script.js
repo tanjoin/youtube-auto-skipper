@@ -581,7 +581,10 @@ class PressNextButtonController {
   }
 
   observe() {
-    if (this.getNextButton().getBoundingClientRect().x > 0 || this.getNextButton().getBoundingClientRect().y > 0) {
+    if (!this.getNextButton()) {
+      return;
+    }
+    if (this.getNextButton()?.getBoundingClientRect().x > 0 || this.getNextButton()?.getBoundingClientRect().y > 0) {
       window.dispatchEvent(new Event("showNextButton"));
     }
   }

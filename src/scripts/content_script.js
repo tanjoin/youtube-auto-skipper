@@ -598,6 +598,7 @@ class PressNextButtonController {
   }
 
   press() {
+    console.log(`PressNextButtonController.press`);
     this.getNextButton().click();
   }
 }

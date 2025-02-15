@@ -574,6 +574,31 @@ class SkipMembersOnlyController {
   }
 }
 
+class PressNextButtonController {
+
+  getNextButton() {
+    return document.querySelector('button.yt-spec-button-shape-next.yt-spec-button-shape-next--text.yt-spec-button-shape-next--call-to-action.yt-spec-button-shape-next--size-m');
+  }
+
+  observe() {
+    if (this.getNextButton().getBoundingClientRect().x > 0 || this.getNextButton().getBoundingClientRect().y > 0) {
+      window.dispatchEvent(new Event("showNextButton"));
+    }
+  }
+
+  urlChange() {
+    this.observe();
+  }
+
+  onLoad() {
+    window.addEventListener("showNextButton", this.press.bind(this));
+  }
+
+  press() {
+    this.getNextButton().click();
+  }
+}
+
 class ContentScriptController {
   constructor() {
     this.oldUrl = "";
@@ -582,6 +607,7 @@ class ContentScriptController {
     this.deleteShortAreaController = new DeleteShortAreaController();
     this.dismissAdController = new DismissAdController();
     this.skipMembersOnlyController = new SkipMembersOnlyController();
+    this.pressNextButtonController = new PressNextButtonController();
   }
 
   onLoad() {
@@ -591,6 +617,7 @@ class ContentScriptController {
     this.dismissAdController.onLoad();
     this.showViewedBlackLargeButtonController.onLoad();
     this.deleteShortAreaController.onLoad();
+    this.pressNextButtonController.onLoad();
     this.updateIcon();
   }
 
@@ -605,6 +632,7 @@ class ContentScriptController {
       this.dismissAdController.observe();
       this.showViewedBlackLargeButtonController.observe();
       this.deleteShortAreaController.observe();
+      this.pressNextButtonController.observe();
     });
     observer.observe(document.body, {
       childList: true,
@@ -619,6 +647,7 @@ class ContentScriptController {
   onUrlDidChangedToWatch() {
     this.showViewedBlackLargeButtonController.urlChange();
     this.dismissAdController.urlChange();
+    this.pressNextButtonController.urlChange();
     this.skipMembersOnlyController.skip({ isVerifyLater: true });
   }
 

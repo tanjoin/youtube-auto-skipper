@@ -1,6 +1,11 @@
 // content_script.js からリクエストを受け取り、アドレスバーにアイコンを表示する.
 ((global) => {
   "use strict";
+
+  const BADGE_TEXT = ["黒", "隠", "逆", "正", "シ", "2"];
+  const BADGE_COLOR = ["#000000", "#008000", "#0000FF", "#FFFFFF", "#EBB400", "#9C27B0"];
+  const DEFAULT_CONTRAST = 0;
+
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "skip") {
       let xC = request.x; 
@@ -33,10 +38,10 @@
       });
     } else if (request.action === "icon") {
       chrome.storage.local.get({
-        tj_switch_contrast: 0
+        tj_switch_contrast: DEFAULT_CONTRAST
       }, (value) => {
-        chrome.action.setBadgeText({ text: ["黒", "隠", "逆", "正", "シ"][value.tj_switch_contrast] });
-        chrome.action.setBadgeBackgroundColor({ color: ["#000000", "#008000", "#0000FF", "#FFFFFF", "#EBB400"][value.tj_switch_contrast] });
+        chrome.action.setBadgeText({ text: BADGE_TEXT[value.tj_switch_contrast] });
+        chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR[value.tj_switch_contrast] });
       });
     } else {
       chrome.action.show(sender.tab.id);
@@ -46,9 +51,9 @@
 
   chrome.action.onClicked.addListener((tab) => {
     chrome.storage.local.get({
-      tj_switch_contrast: 0
+      tj_switch_contrast: DEFAULT_CONTRAST
     }, (value) => {
-      let newValue = (value.tj_switch_contrast + 1) % 5;
+      let newValue = (value.tj_switch_contrast + 1) % BADGE_TEXT.length;
       chrome.storage.local.set({
         tj_switch_contrast: newValue
       }, () => {
@@ -56,8 +61,8 @@
           target: { tabId: tab.id },
           func: () => window.dispatchEvent(new Event("clickActionTJEvent"))
         });
-        chrome.action.setBadgeText({ text: ["黒", "隠", "逆", "正", "シ"][newValue] });
-        chrome.action.setBadgeBackgroundColor({ color: ["#000000", "#008000", "#0000FF", "#FFFFFF", "#EBB400"][newValue] });
+        chrome.action.setBadgeText({ text: BADGE_TEXT[newValue] });
+        chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR[newValue] });
       });
     });
   });

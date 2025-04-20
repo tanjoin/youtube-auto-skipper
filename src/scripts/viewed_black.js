@@ -88,6 +88,19 @@ class VideoItem {
   applyResetOpacity() {
     this.e.style.opacity = this.resetOpacity();
   }
+
+  // Width Methods
+  applyWidth200() {
+    this.e.dataset.width = this.e.style.width;
+    this.e.style.width = "200px";
+  }
+
+  applyWidthReset() {
+    if (this.e.dataset.width) {
+      this.e.style.width = this.e.dataset.width;
+      delete this.e.dataset.width;
+    }
+  }
 };
 
 class ViewedBlackController {
@@ -102,6 +115,7 @@ class ViewedBlackController {
       INVERT: 2,
       STANDARD: 3,
       SHORT_HIDDEN: 4,
+      SIZE_WITDH_300: 5,
     };
   }
 
@@ -157,6 +171,7 @@ class ViewedBlackController {
             }
           }
           videoItem.applyResetDisplay();
+          videoItem.applyWidthReset();
           break;
         case ViewedBlackController.SWITCH_CONTRAST_TYPE.HIDDEN:
           videoItem.applyResetOpacity();
@@ -170,6 +185,7 @@ class ViewedBlackController {
             }
             videoItem.applyResetDisplay();
           }
+          videoItem.applyWidthReset();
           break;
         case ViewedBlackController.SWITCH_CONTRAST_TYPE.INVERT:
           if (videoItem.isViewedBlack()) {
@@ -182,10 +198,12 @@ class ViewedBlackController {
             videoItem.applyViewedBlackOpacity();
           }
           videoItem.applyResetDisplay();
+          videoItem.applyWidthReset();
           break;
         case ViewedBlackController.SWITCH_CONTRAST_TYPE.STANDARD:
           videoItem.applyResetOpacity();
           videoItem.applyResetDisplay();
+          videoItem.applyWidthReset();
           break;
         case ViewedBlackController.SWITCH_CONTRAST_TYPE.SHORT_HIDDEN:
           if (videoItem.isShort()) {
@@ -194,6 +212,14 @@ class ViewedBlackController {
             videoItem.applyResetOpacity();
             videoItem.applyResetDisplay();
           }
+          videoItem.applyWidthReset();
+          break;
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SIZE_WITDH_300:
+          if (videoItem.isViewedBlack()) {
+            videoItem.applyViewedBlackOpacity();
+          }
+          videoItem.applyResetDisplay();
+          videoItem.applyWidth200();
           break;
       }
     });

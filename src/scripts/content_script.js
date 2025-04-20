@@ -154,7 +154,6 @@ class DismissAdController {
     let oX = button.getBoundingClientRect().x;
     let oY = button.getBoundingClientRect().y;
     if (oX <= 0 || oY <= 0) {
-      is_skipping = 0;
       setTimeout(this.performSkipAction.bind(this), 5000);
       console.log(`DismissAdController.performSkip: skip button not found`);
       return;
@@ -577,6 +576,7 @@ class SkipMembersOnlyController {
 class PressNextButtonController {
 
   getNextButton() {
+    // TODO: コメント欄のボタンにも反応してしまう
     return document.querySelector('button.yt-spec-button-shape-next.yt-spec-button-shape-next--text.yt-spec-button-shape-next--call-to-action.yt-spec-button-shape-next--size-m');
   }
 
@@ -584,6 +584,7 @@ class PressNextButtonController {
     if (!this.getNextButton()) {
       return;
     }
+    return;
     if (this.getNextButton()?.getBoundingClientRect().x > 0 || this.getNextButton()?.getBoundingClientRect().y > 0) {
       window.dispatchEvent(new Event("showNextButton"));
     }

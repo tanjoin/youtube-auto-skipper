@@ -91,15 +91,11 @@ class VideoItem {
 
   // Width Methods
   applyWidth200() {
-    this.e.dataset.width = this.e.style.width;
     this.e.style.width = "200px";
   }
 
   applyWidthReset() {
-    if (this.e.dataset.width) {
-      this.e.style.width = this.e.dataset.width;
-      delete this.e.dataset.width;
-    }
+    this.e.style.width = "";
   }
 };
 
@@ -115,7 +111,8 @@ class ViewedBlackController {
       INVERT: 2,
       STANDARD: 3,
       SHORT_HIDDEN: 4,
-      SIZE_WITDH_300: 5,
+      SIZE_WITDH_200: 5,
+      SIZE_WITDH_200_HIDDEN: 6,
     };
   }
 
@@ -214,11 +211,18 @@ class ViewedBlackController {
           }
           videoItem.applyWidthReset();
           break;
-        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SIZE_WITDH_300:
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SIZE_WITDH_200:
           if (videoItem.isViewedBlack()) {
             videoItem.applyViewedBlackOpacity();
           }
           videoItem.applyResetDisplay();
+          videoItem.applyWidth200();
+          break;
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SIZE_WITDH_200_HIDDEN:
+          videoItem.applyResetOpacity();
+          if (videoItem.isViewedBlack()) {
+            videoItem.applyNoneDisplay();
+          }
           videoItem.applyWidth200();
           break;
       }

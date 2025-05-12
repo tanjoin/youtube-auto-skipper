@@ -575,18 +575,17 @@ class SkipMembersOnlyController {
 
 class PressNextButtonController {
 
-  getNextButton() {
-    // TODO: コメント欄のボタンにも反応してしまう
-    return document.querySelector('button.yt-spec-button-shape-next.yt-spec-button-shape-next--text.yt-spec-button-shape-next--call-to-action.yt-spec-button-shape-next--size-m');
+  getConfirmDialogList() {
+    return [...document.querySelectorAll('yt-confirm-dialog-renderer')]
+        .filter((y) => y.textContent.includes('続きを視聴しますか？'))[0];
   }
 
   observe() {
-    if (!this.getNextButton()) {
-      return;
-    }
-    return;
-    if (this.getNextButton()?.getBoundingClientRect().x > 0 || this.getNextButton()?.getBoundingClientRect().y > 0) {
-      window.dispatchEvent(new Event("showNextButton"));
+    const confirmDialogList = this.getConfirmDialogList();
+    if (confirmDialogList.length > 0) {
+      confirmDialogList        
+        .map((y) => y.querySelector('#confirm-button > yt-button-shape > button'))
+        .forEach((b) => b.click());
     }
   }
 

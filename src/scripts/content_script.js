@@ -577,12 +577,12 @@ class PressNextButtonController {
 
   getConfirmDialogList() {
     return [...document.querySelectorAll('yt-confirm-dialog-renderer')]
-        .filter((y) => y.textContent.includes('続きを視聴しますか？'))[0];
+        .filter((y) => y.textContent.includes('続きを視聴しますか？'));
   }
 
   observe() {
     const confirmDialogList = this.getConfirmDialogList();
-    if (confirmDialogList.length > 0) {
+    if (confirmDialogList?.length > 0) {
       confirmDialogList        
         .map((y) => y.querySelector('#confirm-button > yt-button-shape > button'))
         .forEach((b) => b.click());

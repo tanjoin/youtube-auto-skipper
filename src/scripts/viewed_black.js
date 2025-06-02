@@ -113,6 +113,7 @@ class ViewedBlackController {
       SHORT_HIDDEN: 4,
       SIZE_WITDH_200: 5,
       SIZE_WITDH_200_HIDDEN: 6,
+      SIZE_WITDH_200_INVERT: 7,
     };
   }
 
@@ -223,6 +224,19 @@ class ViewedBlackController {
           if (videoItem.isViewedBlack()) {
             videoItem.applyNoneDisplay();
           }
+          videoItem.applyWidth200();
+          break;
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SIZE_WITDH_200_INVERT:          
+          if (videoItem.isViewedBlack()) {
+            if (videoItem.isProgress()) {
+              videoItem.applyProgressOpacity();
+            } else {
+              videoItem.applyResetOpacity();
+            }
+          } else {
+            videoItem.applyViewedBlackOpacity();
+          }
+          videoItem.applyResetDisplay();
           videoItem.applyWidth200();
           break;
       }

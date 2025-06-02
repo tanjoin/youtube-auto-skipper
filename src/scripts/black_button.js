@@ -49,6 +49,16 @@ class VideoGridItem {
     return this.href.includes("shorts/");
   }
 
+  hasButton() {
+    return this.element.querySelector(".tj-kurakusuru") !== null;
+  }
+
+  removeButton() {
+    if (this.hasButton()) {
+      this.element.querySelector(".tj-kurakusuru").remove();
+    }
+  }
+
   createButton(textContent, backgroundColor, color, onClick) {
     const button = document.createElement("button");
     button.className = "tj-kurakusuru";
@@ -84,6 +94,7 @@ class VideoGridItem {
   }
 
   applyDarkButton() {
+    this.removeButton();
     if (this.isDark()) {
       this.createRemoveDarkButton();
     } else {

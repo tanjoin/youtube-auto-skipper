@@ -24,7 +24,12 @@ class VideoGridItem {
   }
 
   get videoTitle() {
-    return this.element.querySelector("#video-title, [class$='__title']");
+    let title = this.element.querySelector("#video-title, [class$='__title']");
+    if (!title) {
+      console.warn("videoTitle not found", this.element);
+      alert("videoTitle not found. Please report to the developer.");
+    }
+    return title;
   }
 
   get id() {

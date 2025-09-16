@@ -3,7 +3,7 @@
   "use strict";
 
   const BADGE_TEXT = ["黒", "隠", "逆", "正", "シ", "2", "2隠", "2逆"];
-  const BADGE_COLOR = ["#000000", "#008000", "#0000FF", "#FFFFFF", "#EBB400", "#9C27B0", "#333333", "#41C9FF"];
+  const BADGE_COLOR = ["#000000", "#008000", "#0000FF", "#FFFFFF", "#EBB400", "#632DCE", "#AAAAAA", "#CE2D47"];
   const DEFAULT_CONTRAST = 0;
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

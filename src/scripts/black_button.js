@@ -24,7 +24,7 @@ class VideoGridItem {
   }
 
   get videoTitle() {
-    return this.element.querySelector("#video-title");
+    return this.element.querySelector("#video-title, [class$='__title']");
   }
 
   get id() {

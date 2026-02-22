@@ -2,8 +2,8 @@
 ((global) => {
   "use strict";
 
-  const BADGE_TEXT = ["黒", "隠", "逆", "正", "シ", "2", "2隠", "2逆"];
-  const BADGE_COLOR = ["#000000", "#EF4444", "#F59E0B", "#84CC16", "#14B8A6", "#3B82F6", "#6366F1", "#D946EF"];
+  const BADGE_TEXT = ["黒", "隠", "逆", "正", "シ", "2黒", "2隠", "2逆"];
+  const BADGE_COLOR = ["#000000", "#B91C1C", "#B45309", "#3F6212", "#0F766E", "#1D4ED8", "#4338CA", "#A21CAF"];
   const DEFAULT_CONTRAST = 0;
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -41,6 +41,7 @@
         tj_switch_contrast: DEFAULT_CONTRAST
       }, (value) => {
         chrome.action.setBadgeText({ text: BADGE_TEXT[value.tj_switch_contrast] });
+        chrome.action.setBadgeTextColor({ color: "#FFFFFF" });
         chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR[value.tj_switch_contrast] });
       });
     } else {
@@ -62,6 +63,7 @@
           func: () => window.dispatchEvent(new Event("clickActionTJEvent"))
         });
         chrome.action.setBadgeText({ text: BADGE_TEXT[newValue] });
+        chrome.action.setBadgeTextColor({ color: "#FFFFFF" });
         chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR[newValue] });
       });
     });

@@ -151,19 +151,28 @@ class BlackButtonController {
   }
 
   onLoad() {
-    window.addEventListener('load', this.setup.bind(this));
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      this.setup();
+    } else {
+      window.addEventListener('load', this.setup.bind(this));
+    }
     window.addEventListener('movieCountChange', this.updateBlackButton.bind(this));
   }
 
   setup() {
     console.log(`BlackButtonController.setup`);
     if (!document.body) {
-      window.setTimeout(this.setup, 5000);
+      window.setTimeout(this.setup.bind(this), 5000);
       return;
     }
     let observer = new MutationObserver((mutations) => {
-      if (this.movieCount !== this.getAllVideoGridItems().length) {
-        this.movieCount = this.getAllVideoGridItems().length;
+      let allVideoGridItems = this.getAllVideoGridItems();
+      if (this.movieCount !== allVideoGridItems.length) {
+        this.movieCount = allVideoGridItems.length;
+        window.dispatchEvent(new Event("movieCountChange"));
+        return;
+      }
+      if (allVideoGridItems.some((e) => !e.querySelector(".tj-kurakusuru"))) {
         window.dispatchEvent(new Event("movieCountChange"));
       }
     });

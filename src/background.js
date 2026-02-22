@@ -2,8 +2,16 @@
 ((global) => {
   "use strict";
 
-  const BADGE_TEXT = ["黒", "隠", "逆", "正", "シ", "2黒", "2隠", "2逆"];
-  const BADGE_COLOR = ["#000000", "#B91C1C", "#B45309", "#3F6212", "#0F766E", "#1D4ED8", "#4338CA", "#A21CAF"];
+  const BADGE = [
+    { text: "黒", color: "#000000", textColor: "#FFFFFF" },
+    { text: "隠", color: "#16A34A", textColor: "#FFFFFF" },
+    { text: "逆", color: "#DC2626", textColor: "#FFFFFF" },
+    { text: "正", color: "#FFFFFF", textColor: "#000000" },
+    { text: "シ", color: "#2563EB", textColor: "#FFFFFF" },
+    { text: "2黒", color: "#6B7280", textColor: "#FFFFFF" },
+    { text: "2隠", color: "#4ADE80", textColor: "#064E3B" },
+    { text: "2逆", color: "#F87171", textColor: "#7F1D1D" }
+  ];
   const DEFAULT_CONTRAST = 0;
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -40,9 +48,10 @@
       chrome.storage.local.get({
         tj_switch_contrast: DEFAULT_CONTRAST
       }, (value) => {
-        chrome.action.setBadgeText({ text: BADGE_TEXT[value.tj_switch_contrast] });
-        chrome.action.setBadgeTextColor({ color: "#FFFFFF" });
-        chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR[value.tj_switch_contrast] });
+        let badge = BADGE[value.tj_switch_contrast];
+        chrome.action.setBadgeText({ text: badge.text });
+        chrome.action.setBadgeTextColor({ color: badge.textColor });
+        chrome.action.setBadgeBackgroundColor({ color: badge.color });
       });
     } else {
       chrome.action.show(sender.tab.id);
@@ -54,17 +63,18 @@
     chrome.storage.local.get({
       tj_switch_contrast: DEFAULT_CONTRAST
     }, (value) => {
-      let newValue = (value.tj_switch_contrast + 1) % BADGE_TEXT.length;
+      let newValue = (value.tj_switch_contrast + 1) % BADGE.length;
       chrome.storage.local.set({
         tj_switch_contrast: newValue
       }, () => {
+        let badge = BADGE[newValue];
         chrome.scripting.executeScript({
           target: { tabId: tab.id },
           func: () => window.dispatchEvent(new Event("clickActionTJEvent"))
         });
-        chrome.action.setBadgeText({ text: BADGE_TEXT[newValue] });
-        chrome.action.setBadgeTextColor({ color: "#FFFFFF" });
-        chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR[newValue] });
+        chrome.action.setBadgeText({ text: badge.text });
+        chrome.action.setBadgeTextColor({ color: badge.textColor });
+        chrome.action.setBadgeBackgroundColor({ color: badge.color });
       });
     });
   });

@@ -20,7 +20,7 @@ class VideoGridItem {
   }
 
   get href() { 
-    return this.a.href;
+    return this.a?.href;
   }
 
   get videoTitle() {
@@ -33,6 +33,9 @@ class VideoGridItem {
   }
 
   get id() {
+    if (!this.href) {
+      return null;
+    }
     if (this.isShort()) {
       return this.href.split("shorts/").pop();
     }
@@ -47,11 +50,11 @@ class VideoGridItem {
   }
 
   isLive() {
-    return this.href.includes('live/');
+    return this.href?.includes('live/') || false;
   }
 
   isShort() {
-    return this.href.includes("shorts/");
+    return this.href?.includes("shorts/") || false;
   }
 
   hasButton() {

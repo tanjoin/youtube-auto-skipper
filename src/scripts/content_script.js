@@ -235,6 +235,7 @@ class ReloadConfirmDialog {
     if (e) {
       this.element = e;
     } else {
+      this.onKeyDown = this.handleKeyDown.bind(this);
       this.addFadeInAnimation();
       this.addFadeOutAnimation();
       this.element = document.createElement("div");
@@ -256,15 +257,16 @@ class ReloadConfirmDialog {
 
       let flexBox = document.createElement("div");
       flexBox.style.display = "flex";
-      flexBox.style.justifyContent = "center";
+      flexBox.style.justifyContent = "space-between";
       flexBox.style.alignItems = "center";
       flexBox.style.height = "100%";
+      flexBox.style.paddingLeft = "12px";
       this.element.appendChild(flexBox);
 
       let message = document.createElement("div");
       message.textContent = "リロードしますか？";
       message.style.textAlign = "center";
-      message.style.paddingLeft = "12px";
+      message.style.paddingRight = "12px";
       flexBox.appendChild(message);
 
       let buttons = document.createElement("div");
@@ -273,7 +275,8 @@ class ReloadConfirmDialog {
       buttons.style.alignItems = "center";
       buttons.style.flexDirection = "row";
       buttons.style.marginLeft = "auto";
-      buttons.style.paddingRight = "12px";
+      buttons.style.gap = "4px";
+      buttons.style.paddingRight = "8px";
       buttons.style.height = "100%";
       flexBox.appendChild(buttons);
 
@@ -285,30 +288,43 @@ class ReloadConfirmDialog {
       yes.style.padding = "6px";
       yes.style.cursor = "pointer";
       yes.style.height = "100%";
-      yes.style.minWidth = "100px";
+      yes.style.minWidth = "180px";
       yes.style.fontSize = "16px";
+      yes.style.fontWeight = "bold";
       yes.addEventListener("click", () => {
         tjLog(`ReloadConfirmDialog.yes.click`);
-        location.reload();
+        this.confirmReload();
       });
       buttons.appendChild(yes);
+      this.yes = yes;
 
-      let no = document.createElement("button");
-      no.textContent = "いいえ";
-      no.style.backgroundColor = "rgb(207, 226, 255)";
-      no.style.color = "rgb(5, 44, 101)";
-      no.style.border = "0";
-      no.style.padding = "6px";
-      no.style.cursor = "pointer";
-      no.style.height = "100%";
-      no.style.minWidth = "100px";
-      no.style.fontSize = "16px";
-      no.addEventListener("click", () => {
+      let close = document.createElement("button");
+      close.textContent = "×";
+      close.style.backgroundColor = "rgb(207, 226, 255)";
+      close.style.color = "rgb(5, 44, 101)";
+      close.style.border = "0";
+      close.style.padding = "6px";
+      close.style.cursor = "pointer";
+      close.style.height = "100%";
+      close.style.width = "48px";
+      close.style.fontSize = "20px";
+      close.addEventListener("click", () => {
         tjLog(`ReloadConfirmDialog.no.click`);
         this.hide();
       });
-      buttons.appendChild(no);
+      buttons.appendChild(close);
+
+      flexBox.addEventListener("click", (event) => {
+        if (event.target === close || event.target === yes) {
+          return;
+        }
+        tjLog(`ReloadConfirmDialog.yes.click`);
+        this.confirmReload();
+      });
+
       document.body.appendChild(this.element);
+      document.addEventListener("keydown", this.onKeyDown);
+      setTimeout(() => this.yes?.focus(), 0);
     }
   }
 
@@ -350,7 +366,37 @@ class ReloadConfirmDialog {
     );
   }
 
+  handleKeyDown(event) {
+    if (!this.element || !document.body.contains(this.element)) {
+      return;
+    }
+    if (event.key === "Enter" || event.key === "y" || event.key === "Y") {
+      event.preventDefault();
+      tjLog(`ReloadConfirmDialog.yes.click`);
+      this.confirmReload();
+      return;
+    }
+    if (event.key === "Escape" || event.key === "n" || event.key === "N") {
+      event.preventDefault();
+      tjLog(`ReloadConfirmDialog.no.click`);
+      this.hide();
+    }
+  }
+
+  confirmReload() {
+    this.removeKeyDownListener();
+    location.reload();
+  }
+
+  removeKeyDownListener() {
+    if (!this.onKeyDown) {
+      return;
+    }
+    document.removeEventListener("keydown", this.onKeyDown);
+  }
+
   hide() {
+    this.removeKeyDownListener();
     this.element.style.animationFillMode = "both";
     this.element.style.animation = "tj_reload_confirm_dialog_animation_fadeout 0.5s";
     this.element.addEventListener("animationend", () => {

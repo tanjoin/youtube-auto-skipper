@@ -125,7 +125,7 @@ class ViewedBlackController {
   }
 
   setup() {
-    console.log(`ViewedBlackController.setup`);
+    tjLog(`ViewedBlackController.setup`);
     if (!document.body) {
       window.setTimeout(this.setup.bind(this), 5000);
       return;
@@ -143,7 +143,7 @@ class ViewedBlackController {
   }
 
   updateViewedBlackOpacity() {
-    console.log(`ViewedBlackController.updateViewedBlackOpacity`);
+    tjLog(`ViewedBlackController.updateViewedBlackOpacity`);
     try {
       chrome.storage.local.get({ tj_switch_contrast: false }, (value) => {
         this.switchContrast = value.tj_switch_contrast;
@@ -154,7 +154,7 @@ class ViewedBlackController {
   }
 
   applyOpacity() {
-    console.log(`applyOpacity: ${Object.keys(ViewedBlackController.SWITCH_CONTRAST_TYPE)[this.switchContrast]}`);
+    tjLog(`applyOpacity: ${Object.keys(ViewedBlackController.SWITCH_CONTRAST_TYPE)[this.switchContrast]}`);
     this.getAllMovies().forEach((e) => {
       let videoItem = new VideoItem(e);
       switch(this.switchContrast) {

@@ -58,7 +58,7 @@ class DeleteShortAreaController {
 
   // ショート動画削除
   deleteShortArea() {
-    console.log(`DeleteShortAreaController.deleteShortArea`);
+    tjLog(`DeleteShortAreaController.deleteShortArea`);
     this.getShortArea()
       .filter((d) => !d.innerText.includes("新しい順"))
       .forEach((d) => (d.style.display = "none"));
@@ -124,7 +124,7 @@ class DismissAdController {
   // Methods
 
   checkCurrentTime() {
-    console.log(`DismissAdController.checkCurrentTime`);
+    tjLog(`DismissAdController.checkCurrentTime`);
     if (!this.isVideoPage()) {
       this.currentTime = 0;
       return;
@@ -145,7 +145,7 @@ class DismissAdController {
     try {
       chrome.runtime?.sendMessage({ action: "skip", x, y }, callback);
     } catch (e) {
-      console.log(`DismissAdController.runtimeAdSkip: ${e}`);
+      tjLog(`DismissAdController.runtimeAdSkip: ${e}`);
     }
   }
 
@@ -155,7 +155,7 @@ class DismissAdController {
     let oY = button.getBoundingClientRect().y;
     if (oX <= 0 || oY <= 0) {
       setTimeout(this.performSkipAction.bind(this), 5000);
-      console.log(`DismissAdController.performSkip: skip button not found`);
+      tjLog(`DismissAdController.performSkip: skip button not found`);
       return;
     }
     this.runtimeAdSkip(oX, oY, (response) => {
@@ -175,12 +175,12 @@ class DismissAdController {
       return;
     }
     this.isRunning = true;
-    console.log(`DismissAdController.performSkipAction`);
+    tjLog(`DismissAdController.performSkipAction`);
     const button = this.getSkipButton();
     if (button) {
       button.style.display = "";
       this.performSkip(button);
-      console.log(`DismissAdController.performSkipAction: skip button found`);
+      tjLog(`DismissAdController.performSkipAction: skip button found`);
       return;
     }
     const adInterruptingElement = this.getAdInterruptingElement();
@@ -191,16 +191,16 @@ class DismissAdController {
           timeDuration?.textContent?.split(":")[1]
       );
       let isFullscreen = document.fullscreenElement != null;
-      console.log(`DismissAdController.performSkipAction: ${seconds} seconds`);
+      tjLog(`DismissAdController.performSkipAction: ${seconds} seconds`);
       if (seconds > 10) {
         this.checkCurrentTime();
         let params = new URLSearchParams(location.search);
         if (isFullscreen) {
           params.set("fullscreen", true);
         }
-        console.log(`DismissAdController.performSkipAction: currentTime -> ${this.currentTime} seconds`);
+        tjLog(`DismissAdController.performSkipAction: currentTime -> ${this.currentTime} seconds`);
         if (this.currentTime > 0) {
-          console.log(`DismissAdController.performSkipAction: skip to ${this.currentTime} seconds`);
+          tjLog(`DismissAdController.performSkipAction: skip to ${this.currentTime} seconds`);
           params.set("t", this.currentTime);
           location.search = params.toString();
         } else {
@@ -208,12 +208,12 @@ class DismissAdController {
         }
       }
     }
-    console.log(`DismissAdController.performSkipAction: skip button not found`);
+    tjLog(`DismissAdController.performSkipAction: skip button not found`);
     setTimeout(() => this.isRunning = false, 1000);
   }
 
   showReloadConfirmation() {
-    console.log(`DismissAdController.showReloadConfirmation`);
+    tjLog(`DismissAdController.showReloadConfirmation`);
     if (ReloadConfirmDialog.isExist()) {
       return;
     }
@@ -284,7 +284,7 @@ class ReloadConfirmDialog {
       yes.style.minWidth = "100px";
       yes.style.fontSize = "16px";
       yes.addEventListener("click", () => {
-        console.log(`ReloadConfirmDialog.yes.click`);
+        tjLog(`ReloadConfirmDialog.yes.click`);
         location.reload();
       });
       buttons.appendChild(yes);
@@ -300,7 +300,7 @@ class ReloadConfirmDialog {
       no.style.minWidth = "100px";
       no.style.fontSize = "16px";
       no.addEventListener("click", () => {
-        console.log(`ReloadConfirmDialog.no.click`);
+        tjLog(`ReloadConfirmDialog.no.click`);
         this.hide();
       });
       buttons.appendChild(no);
@@ -466,7 +466,7 @@ class ShowViewedBlackLargeButtonController {
   }
 
   viewedBlack() {
-    console.log(`ShowViewedBlackLargeButtonController.viewedBlack`);
+    tjLog(`ShowViewedBlackLargeButtonController.viewedBlack`);
     if (this.getViewedBlackMain()) {
       this.getViewedBlackMain().remove();
     }
@@ -535,7 +535,7 @@ class UrlChangeController {
   }
 
   urlChange() {
-    console.log(`UrlChangeController.urlChange`);
+    tjLog(`UrlChangeController.urlChange`);
     if (location.href.includes("/watch?v=") && this.onUrlDidChangedToWatch) {
       this.onUrlDidChangedToWatch();
     }
@@ -562,7 +562,7 @@ class SkipMembersOnlyController {
   }
 
   skip({ isVerifyLater }) {
-    console.log(`SkipMembersOnlyController.skip`);
+    tjLog(`SkipMembersOnlyController.skip`);
     if (this.isMembersOnly()) {
         const result = this.getCurrentPlaylistPanel();
         if (result) { 
@@ -608,7 +608,7 @@ class PressNextButtonController {
   }
 
   press() {
-    console.log(`PressNextButtonController.press`);
+    tjLog(`PressNextButtonController.press`);
     this.getNextButton().click();
   }
 }
@@ -640,7 +640,7 @@ class ContentScriptController {
   }
 
   setup() {
-    console.log(`ContentScriptController.setup`);
+    tjLog(`ContentScriptController.setup`);
     if (!document.body) {
       window.setTimeout(this.setup.bind(this), 500);
       return;

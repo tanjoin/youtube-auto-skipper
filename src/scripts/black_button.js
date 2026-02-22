@@ -169,6 +169,7 @@ class BlackButtonController {
       return;
     }
     let observer = new MutationObserver((mutations) => {
+      this.hideFeedAdRichItems();
       let allVideoGridItems = this.getAllVideoGridItems();
       if (this.movieCount !== allVideoGridItems.length) {
         this.movieCount = allVideoGridItems.length;
@@ -187,7 +188,19 @@ class BlackButtonController {
 
   updateBlackButton() {
     tjLog(`BlackButtonController.updateBlackButton`);
+    this.hideFeedAdRichItems();
     this.addDarkButton();
+  }
+
+  hideFeedAdRichItems() {
+    this.getFeedAdRichItems().forEach((e) => {
+      e.style.setProperty("display", "none", "important");
+    });
+  }
+
+  getFeedAdRichItems() {
+    return [...document.querySelectorAll("ytd-rich-item-renderer")]
+      .filter((e) => e.querySelector("feed-ad-metadata-view-model"));
   }
 
   addDarkButton() {
@@ -208,7 +221,7 @@ class BlackButtonController {
       ...document.querySelectorAll("ytd-video-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
       ...document.querySelectorAll("ytd-rich-item-renderer"),
-    ];
+    ].filter((e) => !e.querySelector("feed-ad-metadata-view-model"));
   }
 };
 

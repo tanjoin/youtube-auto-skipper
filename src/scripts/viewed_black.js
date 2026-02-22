@@ -131,6 +131,7 @@ class ViewedBlackController {
       return;
     }
     let observer = new MutationObserver((mutations) => {
+      this.hideFeedAdRichItems();
       if (this.movieCount !== this.getAllMovies().length) {
         this.movieCount = this.getAllMovies().length;
         window.dispatchEvent(new Event("movieCountChange"));
@@ -144,6 +145,7 @@ class ViewedBlackController {
 
   updateViewedBlackOpacity() {
     tjLog(`ViewedBlackController.updateViewedBlackOpacity`);
+    this.hideFeedAdRichItems();
     try {
       chrome.storage.local.get({ tj_switch_contrast: false }, (value) => {
         this.switchContrast = value.tj_switch_contrast;
@@ -249,7 +251,18 @@ class ViewedBlackController {
       ...document.querySelectorAll("ytd-rich-item-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
       ...document.querySelectorAll("ytd-video-renderer"),
-    ];
+    ].filter((e) => !e.querySelector("feed-ad-metadata-view-model"));
+  }
+
+  hideFeedAdRichItems() {
+    this.getFeedAdRichItems().forEach((e) => {
+      e.style.setProperty("display", "none", "important");
+    });
+  }
+
+  getFeedAdRichItems() {
+    return [...document.querySelectorAll("ytd-rich-item-renderer")]
+      .filter((e) => e.querySelector("feed-ad-metadata-view-model"));
   }
 };
 

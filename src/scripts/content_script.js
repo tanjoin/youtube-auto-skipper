@@ -49,8 +49,13 @@ class DeleteShortAreaController {
   }
 
   observe() {
-    if (this.shortAreaCount !== this.getShortArea().length) {
-      this.shortAreaCount = this.getShortArea().length;
+    let shortAreas = this.getShortArea();
+    if (this.shortAreaCount !== shortAreas.length) {
+      this.shortAreaCount = shortAreas.length;
+      window.dispatchEvent(new Event("shortAreaCountChange"));
+      return;
+    }
+    if (shortAreas.some((d) => d.style.display !== "none")) {
       window.dispatchEvent(new Event("shortAreaCountChange"));
     }
   }
@@ -60,13 +65,12 @@ class DeleteShortAreaController {
   deleteShortArea() {
     tjLog(`DeleteShortAreaController.deleteShortArea`);
     this.getShortArea()
-      .filter((d) => !d.innerText.includes("新しい順"))
-      .forEach((d) => (d.style.display = "none"));
+      .forEach((d) => d.style.setProperty("display", "none", "important"));
   }
 
   getShortArea() {
     return [
-      ...document.querySelectorAll("div#contents ytd-rich-section-renderer, div#contents ytd-reel-shelf-renderer"),
+      ...document.querySelectorAll("ytd-rich-section-renderer, ytd-reel-shelf-renderer"),
     ];
   }
 };

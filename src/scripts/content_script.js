@@ -69,9 +69,8 @@ class DeleteShortAreaController {
   }
 
   getShortArea() {
-    return [
-      ...document.querySelectorAll("ytd-rich-section-renderer, ytd-reel-shelf-renderer"),
-    ];
+    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+      .filter((d) => d.querySelector('a[href*="/shorts/"]'));
   }
 };
 

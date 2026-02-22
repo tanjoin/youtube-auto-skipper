@@ -9,10 +9,20 @@
     { text: "正", color: "#FFFFFF", textColor: "#000000" },
     { text: "シ", color: "#2563EB", textColor: "#FFFFFF" },
     { text: "2黒", color: "#6B7280", textColor: "#FFFFFF" },
-    { text: "2隠", color: "#4ADE80", textColor: "#064E3B" },
-    { text: "2逆", color: "#F87171", textColor: "#7F1D1D" }
+    { text: "2隠", color: "#4ADE80", textColor: "#000000" },
+    { text: "2逆", color: "#F87171", textColor: "#FFFFFF" }
   ];
   const DEFAULT_CONTRAST = 0;
+
+  function applyBadge(tabId, contrast) {
+    let badge = BADGE[contrast] || BADGE[DEFAULT_CONTRAST];
+    let details = { tabId: tabId };
+    chrome.action.setBadgeText({ ...details, text: badge.text });
+    if (chrome.action.setBadgeTextColor) {
+      chrome.action.setBadgeTextColor({ ...details, color: badge.textColor });
+    }
+    chrome.action.setBadgeBackgroundColor({ ...details, color: badge.color });
+  }
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "skip") {
@@ -48,10 +58,7 @@
       chrome.storage.local.get({
         tj_switch_contrast: DEFAULT_CONTRAST
       }, (value) => {
-        let badge = BADGE[value.tj_switch_contrast];
-        chrome.action.setBadgeText({ text: badge.text });
-        chrome.action.setBadgeTextColor({ color: badge.textColor });
-        chrome.action.setBadgeBackgroundColor({ color: badge.color });
+        applyBadge(sender.tab.id, value.tj_switch_contrast);
       });
     } else {
       chrome.action.show(sender.tab.id);
@@ -67,14 +74,11 @@
       chrome.storage.local.set({
         tj_switch_contrast: newValue
       }, () => {
-        let badge = BADGE[newValue];
         chrome.scripting.executeScript({
           target: { tabId: tab.id },
           func: () => window.dispatchEvent(new Event("clickActionTJEvent"))
         });
-        chrome.action.setBadgeText({ text: badge.text });
-        chrome.action.setBadgeTextColor({ color: badge.textColor });
-        chrome.action.setBadgeBackgroundColor({ color: badge.color });
+        applyBadge(tab.id, newValue);
       });
     });
   });

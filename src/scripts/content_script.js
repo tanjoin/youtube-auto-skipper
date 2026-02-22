@@ -505,7 +505,7 @@ class ShowViewedBlackLargeButtonController {
 
 class UrlChangeController {
   constructor() {
-    this.oldUrl = "";
+    this.oldUrl = location.href;
     this.onUrlDidChangedToWatch = undefined;
   }
 
@@ -515,6 +515,16 @@ class UrlChangeController {
 
   onLoad() {
     window.addEventListener("urlChange", this.urlChange.bind(this));
+    window.addEventListener("popstate", this.popState.bind(this));
+    window.addEventListener("pagehide", this.pageHide.bind(this));
+  }
+
+  popState() {
+    this.observe();
+  }
+
+  pageHide() {
+    this.oldUrl = location.href;
   }
 
   observe() {
@@ -615,7 +625,11 @@ class ContentScriptController {
   }
 
   onLoad() {
-    window.addEventListener("load", this.setup.bind(this));
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      this.setup();
+    } else {
+      window.addEventListener("load", this.setup.bind(this), { once: true });
+    }
     this.urlChangeController.registerOnUrlDidChangedToWatchListener(this.onUrlDidChangedToWatch.bind(this));
     this.urlChangeController.onLoad();
     this.dismissAdController.onLoad();

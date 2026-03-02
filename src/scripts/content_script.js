@@ -39,6 +39,74 @@ class ViewedBlackSwitchLargeButton {
   }
 };
 
+class DeleteNewsAreaController {
+  constructor() {
+    this.newsAreaCount = 0;
+  }
+
+  onLoad() {
+    window.addEventListener("newsAreaCountChange", this.deleteNewsArea.bind(this));
+  }
+
+  observe() {
+    let newsAreas = this.getNewsArea();
+    if (this.newsAreaCount !== newsAreas.length) {
+      this.newsAreaCount = newsAreas.length;
+      window.dispatchEvent(new Event("newsAreaCountChange"));
+      return;
+    }
+    if (newsAreas.some((d) => d.style.display !== "none")) {
+      window.dispatchEvent(new Event("newsAreaCountChange"));
+    }
+  }
+
+  // お知らせ削除
+  deleteNewsArea() {
+    tjLog(`DeleteNewsAreaController.deleteNewsArea`);
+    this.getNewsArea()
+      .forEach((d) => d.style.setProperty("display", "none", "important"));
+  }
+
+  getNewsArea() {
+    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+        .filter((d) => d?.querySelector('#title')?.textContent.includes("ニュース速報"));
+  }
+};
+
+class DeleteRelatedAreaController {
+  constructor() {
+    this.relatedAreaCount = 0;
+  }
+
+  onLoad() {
+    window.addEventListener("relatedAreaCountChange", this.deleteRelatedArea.bind(this));
+  }
+
+  observe() {
+    let relatedAreas = this.getRelatedArea();
+    if (this.relatedAreaCount !== relatedAreas.length) {
+      this.relatedAreaCount = relatedAreas.length;
+      window.dispatchEvent(new Event("relatedAreaCountChange"));
+      return;
+    }
+    if (relatedAreas.some((d) => d.style.display !== "none")) {
+      window.dispatchEvent(new Event("relatedAreaCountChange"));
+    }
+  }
+
+  // 関連動画削除
+  deleteRelatedArea() {
+    tjLog(`DeleteRelatedAreaController.deleteRelatedArea`);
+    this.getRelatedArea()
+      .forEach((d) => d.style.setProperty("display", "none", "important"));
+  }
+
+  getRelatedArea() {
+    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+        .filter((d) => d?.querySelector('#title')?.textContent.includes("関連が強い"));
+  }
+};
+
 class DeleteShortAreaController {
   constructor() {
     this.shortAreaCount = 0;
@@ -59,7 +127,6 @@ class DeleteShortAreaController {
       window.dispatchEvent(new Event("shortAreaCountChange"));
     }
   }
-
 
   // ショート動画削除
   deleteShortArea() {
@@ -668,6 +735,8 @@ class ContentScriptController {
     this.urlChangeController = new UrlChangeController();
     this.showViewedBlackLargeButtonController = new ShowViewedBlackLargeButtonController();
     this.deleteShortAreaController = new DeleteShortAreaController();
+    this.deleteRelatedAreaController = new DeleteRelatedAreaController();
+    this.deleteNewsAreaController = new DeleteNewsAreaController();
     this.dismissAdController = new DismissAdController();
     this.skipMembersOnlyController = new SkipMembersOnlyController();
     this.pressNextButtonController = new PressNextButtonController();
@@ -684,6 +753,8 @@ class ContentScriptController {
     this.dismissAdController.onLoad();
     this.showViewedBlackLargeButtonController.onLoad();
     this.deleteShortAreaController.onLoad();
+    this.deleteRelatedAreaController.onLoad();
+    this.deleteNewsAreaController.onLoad();
     this.pressNextButtonController.onLoad();
     this.updateIcon();
   }
@@ -699,6 +770,8 @@ class ContentScriptController {
       this.dismissAdController.observe();
       this.showViewedBlackLargeButtonController.observe();
       this.deleteShortAreaController.observe();
+      this.deleteRelatedAreaController.observe();
+      this.deleteNewsAreaController.observe();
       this.pressNextButtonController.observe();
     });
     observer.observe(document.body, {

@@ -23,6 +23,10 @@ class VideoGridItem {
     return this.a?.href;
   }
 
+  /* 
+   * タイトルがうまく取得できていない場合は以下のコードをブラウザのコンソールで実行して再度実行して取得できるか確かめてください。
+   * const I = 5; Object.keys(localStorage).filter((key) => localStorage.getItem(key) === "undefined").map((key) => `https://www.youtube.com/watch?v=${key.replace('tj::', '')}`).reverse().filter((url, i, arr) => (console.log("target length:", arr.length), true)).slice(I, I+1).forEach((url) => location.href = url);
+   */
   get videoTitle() {
     let title = this.element.querySelector("#video-title, [class$='__title'], h3[title]");
     if (!title) {
@@ -224,6 +228,7 @@ class BlackButtonController {
       ...document.querySelectorAll("ytd-video-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
       ...document.querySelectorAll("ytd-rich-item-renderer"),
+      ...document.querySelectorAll("yt-lockup-view-model"),
     ].filter((e) => !e.querySelector("feed-ad-metadata-view-model"));
   }
 };

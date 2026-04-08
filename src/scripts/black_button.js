@@ -24,7 +24,7 @@ class VideoGridItem {
   }
 
   get videoTitle() {
-    let title = this.element.querySelector("#video-title, [class$='__title']");
+    let title = this.element.querySelector("#video-title, [class$='__title'], h3[title]");
     if (!title) {
       console.warn("videoTitle not found", this.element);
       alert("videoTitle not found. Please report to the developer.");

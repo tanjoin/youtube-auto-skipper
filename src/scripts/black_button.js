@@ -190,7 +190,7 @@ class BlackButtonController {
     ) {
       this.setup();
     } else {
-      window.addEventListener("load", this.setup.bind(this));
+      window.addEventListener("load", this.setup.bind(this), { once: true });
     }
     window.addEventListener(
       "movieCountChange",

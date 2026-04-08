@@ -110,6 +110,7 @@ class ViewedBlackController {
   constructor() {
     this.movieCount = 0;
     this.mutationUnsubscribe = null;
+    this.switchContrast = undefined;
   }
 
   static get SWITCH_CONTRAST_TYPE() {
@@ -134,9 +135,14 @@ class ViewedBlackController {
     } else {
       window.addEventListener("load", this.setup.bind(this), { once: true });
     }
+    try {
+      chrome.storage.local.get({ tj_switch_contrast: 0 }, (value) => {
+        this.switchContrast = value.tj_switch_contrast;
+      });
+    } catch (error) {}
     window.addEventListener(
       "movieCountChange",
-      this.updateViewedBlackOpacity.bind(this),
+      this.movieCountChanged.bind(this),
     );
     window.addEventListener(
       "clickActionTJEvent",
@@ -181,6 +187,16 @@ class ViewedBlackController {
         this.applyOpacity();
       });
     } catch (error) {}
+  }
+
+  movieCountChanged() {
+    tjLog(`ViewedBlackController.movieCountChanged`);
+    this.hideFeedAdRichItems();
+    if (this.switchContrast !== undefined) {
+      this.applyOpacity();
+    } else {
+      this.updateViewedBlackOpacity();
+    }
   }
 
   applyOpacity() {

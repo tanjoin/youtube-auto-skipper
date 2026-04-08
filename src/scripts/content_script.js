@@ -526,6 +526,7 @@ class ShowViewedBlackLargeButtonController {
   }
 
   urlChange() {
+    this.currentBelow = null;
     this.viewedBlack();
   }
 

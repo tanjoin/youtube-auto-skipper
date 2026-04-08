@@ -151,6 +151,7 @@ class BlackButtonController {
 
   constructor() {
     this.movieCount = 0;
+    this.mutationUnsubscribe = null;
   }
 
   onLoad() {
@@ -164,26 +165,28 @@ class BlackButtonController {
 
   setup() {
     tjLog(`BlackButtonController.setup`);
+    if (this.mutationUnsubscribe) {
+      return;
+    }
     if (!document.body) {
       window.setTimeout(this.setup.bind(this), 5000);
       return;
     }
-    let observer = new MutationObserver((mutations) => {
-      this.hideFeedAdRichItems();
-      let allVideoGridItems = this.getAllVideoGridItems();
-      if (this.movieCount !== allVideoGridItems.length) {
-        this.movieCount = allVideoGridItems.length;
-        window.dispatchEvent(new Event("movieCountChange"));
-        return;
-      }
-      if (allVideoGridItems.some((e) => !e.querySelector(".tj-kurakusuru"))) {
-        window.dispatchEvent(new Event("movieCountChange"));
-      }
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+    this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(this.observe.bind(this));
+    this.observe();
+  }
+
+  observe() {
+    this.hideFeedAdRichItems();
+    const allVideoGridItems = this.getAllVideoGridItems();
+    if (this.movieCount !== allVideoGridItems.length) {
+      this.movieCount = allVideoGridItems.length;
+      window.dispatchEvent(new Event("movieCountChange"));
+      return;
+    }
+    if (allVideoGridItems.some((e) => !e.querySelector(".tj-kurakusuru"))) {
+      window.dispatchEvent(new Event("movieCountChange"));
+    }
   }
 
   updateBlackButton() {

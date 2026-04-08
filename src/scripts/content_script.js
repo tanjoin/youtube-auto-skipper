@@ -39,6 +39,41 @@ class ViewedBlackSwitchLargeButton {
   }
 };
 
+// その他のトピック を削除
+class DeleteOtherTopicsController {
+  constructor() {
+    this.otherTopicsCount = 0;
+  }
+
+  onLoad() {
+    window.addEventListener("otherTopicsCountChange", this.deleteOtherTopics.bind(this));
+  }
+
+  observe() {
+    let otherTopics = this.getOtherTopics();
+    if (this.otherTopicsCount !== otherTopics.length) {
+      this.otherTopicsCount = otherTopics.length;
+      window.dispatchEvent(new Event("otherTopicsCountChange"));
+      return;
+    }
+    if (otherTopics.some((d) => d.style.display !== "none")) {
+      window.dispatchEvent(new Event("otherTopicsCountChange"));
+    }
+  }
+
+  // その他のトピック削除
+  deleteOtherTopics() {
+    tjLog(`DeleteOtherTopicsController.deleteOtherTopics`);
+    this.getOtherTopics()
+      .forEach((d) => d.style.setProperty("display", "none", "important"));
+  }
+
+  getOtherTopics() {
+    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+        .filter((d) => d?.querySelector('#title')?.textContent.includes("その他のトピック"));
+  }
+};
+
 class DeleteNewsAreaController {
   constructor() {
     this.newsAreaCount = 0;
@@ -732,11 +767,13 @@ class PressNextButtonController {
 class ContentScriptController {
   constructor() {
     this.oldUrl = "";
+    this.mutationUnsubscribe = null;
     this.urlChangeController = new UrlChangeController();
     this.showViewedBlackLargeButtonController = new ShowViewedBlackLargeButtonController();
     this.deleteShortAreaController = new DeleteShortAreaController();
     this.deleteRelatedAreaController = new DeleteRelatedAreaController();
     this.deleteNewsAreaController = new DeleteNewsAreaController();
+    this.deleteOtherTopicsController = new DeleteOtherTopicsController();
     this.dismissAdController = new DismissAdController();
     this.skipMembersOnlyController = new SkipMembersOnlyController();
     this.pressNextButtonController = new PressNextButtonController();
@@ -755,33 +792,37 @@ class ContentScriptController {
     this.deleteShortAreaController.onLoad();
     this.deleteRelatedAreaController.onLoad();
     this.deleteNewsAreaController.onLoad();
+    this.deleteOtherTopicsController.onLoad();
     this.pressNextButtonController.onLoad();
     this.updateIcon();
   }
 
   setup() {
     tjLog(`ContentScriptController.setup`);
+    if (this.mutationUnsubscribe) {
+      return;
+    }
     if (!document.body) {
       window.setTimeout(this.setup.bind(this), 500);
       return;
     }
-    let observer = new MutationObserver((mutations) => {
-      this.urlChangeController.observe();
-      this.dismissAdController.observe();
-      this.showViewedBlackLargeButtonController.observe();
-      this.deleteShortAreaController.observe();
-      this.deleteRelatedAreaController.observe();
-      this.deleteNewsAreaController.observe();
-      this.pressNextButtonController.observe();
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+    this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(this.observe.bind(this));
+    this.observe();
     let params = new URLSearchParams(location.search);
     if (params.get("fullscreen")) {
       document.documentElement.requestFullscreen();
     }
+  }
+
+  observe() {
+    this.urlChangeController.observe();
+    this.dismissAdController.observe();
+    this.showViewedBlackLargeButtonController.observe();
+    this.deleteShortAreaController.observe();
+    this.deleteRelatedAreaController.observe();
+    this.deleteNewsAreaController.observe();
+    this.deleteOtherTopicsController.observe();
+    this.pressNextButtonController.observe();
   }
 
   onUrlDidChangedToWatch() {

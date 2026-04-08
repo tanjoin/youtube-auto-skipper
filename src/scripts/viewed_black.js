@@ -102,6 +102,7 @@ class VideoItem {
 class ViewedBlackController {
   constructor() {
     this.movieCount = 0;
+    this.mutationUnsubscribe = null;
   }
 
   static get SWITCH_CONTRAST_TYPE() {
@@ -118,7 +119,11 @@ class ViewedBlackController {
   }
 
   onLoad() {
-    window.addEventListener("load", this.setup.bind(this));
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      this.setup();
+    } else {
+      window.addEventListener("load", this.setup.bind(this), { once: true });
+    }
     window.addEventListener("movieCountChange", this.updateViewedBlackOpacity.bind(this));
     window.addEventListener("clickActionTJEvent", this.updateViewedBlackOpacity.bind(this));
     window.addEventListener("clickViewedBlackButtonTJEvent", this.updateViewedBlackOpacity.bind(this));
@@ -126,21 +131,24 @@ class ViewedBlackController {
 
   setup() {
     tjLog(`ViewedBlackController.setup`);
+    if (this.mutationUnsubscribe) {
+      return;
+    }
     if (!document.body) {
       window.setTimeout(this.setup.bind(this), 5000);
       return;
     }
-    let observer = new MutationObserver((mutations) => {
-      this.hideFeedAdRichItems();
-      if (this.movieCount !== this.getAllMovies().length) {
-        this.movieCount = this.getAllMovies().length;
-        window.dispatchEvent(new Event("movieCountChange"));
-      }
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+    this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(this.observe.bind(this));
+    this.observe();
+  }
+
+  observe() {
+    this.hideFeedAdRichItems();
+    const allMovies = this.getAllMovies();
+    if (this.movieCount !== allMovies.length) {
+      this.movieCount = allMovies.length;
+      window.dispatchEvent(new Event("movieCountChange"));
+    }
   }
 
   updateViewedBlackOpacity() {

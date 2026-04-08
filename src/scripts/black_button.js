@@ -3,15 +3,11 @@ class VideoGridItem {
     this.element = element;
   }
 
-  get meta() {
+  get metadataContainer() {
     return (
-      this.element.querySelector("#meta") ||
-      this.element.querySelector('[class$="__metadata"]')
+      this.element.querySelector(":scope > #content > yt-lockup-view-model yt-lockup-metadata-view-model") ||
+      this.element.querySelector("yt-lockup-metadata-view-model")
     );
-  }
-
-  get details() {
-    return this.element.querySelector("#details");
   }
 
   get overlay() {
@@ -66,10 +62,6 @@ class VideoGridItem {
     return this.href?.includes("shorts/") || false;
   }
 
-  isLockupViewModel() {
-    return this.element.tagName?.toLowerCase() === "yt-lockup-view-model";
-  }
-
   hasButton() {
     return this.element.querySelector(".tj-kurakusuru") !== null;
   }
@@ -83,39 +75,32 @@ class VideoGridItem {
   createButton(textContent, backgroundColor, color, onClick) {
     const button = document.createElement("button");
     button.className = "tj-kurakusuru";
-    button.width = "30px";
-    button.height = "30px";
     button.textContent = textContent;
     button.style.fontSize = "10px";
-    button.style.position = "absolute";
-    button.style.bottom = 0;
-    button.style.right = 0;
+    button.style.display = "block";
+    button.style.width = "100%";
+    button.style.marginTop = "8px";
+    button.style.boxSizing = "border-box";
     button.style.backgroundColor = backgroundColor;
     button.style.color = color;
-    if (this.isLockupViewModel()) {
-      button.style.whiteSpace = "pre-line";
-    }
     button.style.opacity = 1.0;
     button.addEventListener("click", onClick);
 
-    this.details?.appendChild(button);
-    button.style.removeProperty("position");
-    button.style.removeProperty("bottom");
-    button.style.removeProperty("right");
-    if (
-      !this.isLockupViewModel() &&
-      this.meta?.className.includes("__metadata")
-    ) {
-      this.meta?.parentElement.appendChild(button);
+    if (this.metadataContainer?.parentElement) {
+      this.metadataContainer.parentElement.insertBefore(
+        button,
+        this.metadataContainer.nextSibling,
+      );
     } else {
-      this.meta?.appendChild(button);
+      this.element.appendChild(button);
     }
+
     return button;
   }
 
   createRemoveDarkButton() {
     this.createButton(
-      this.isLockupViewModel() ? "取\n消" : "取り消す",
+      "取り消す",
       "white",
       "black",
       this.onClickRemoveDark.bind(this),
@@ -124,7 +109,7 @@ class VideoGridItem {
 
   createAddDarkButton() {
     this.createButton(
-      this.isLockupViewModel() ? "×\n暗\nく\nす\nる" : "× 暗くする",
+      "× 暗くする",
       "black",
       "white",
       this.onClickAddDark.bind(this),

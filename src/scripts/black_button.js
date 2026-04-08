@@ -4,7 +4,10 @@ class VideoGridItem {
   }
 
   get meta() {
-    return this.element.querySelector("#meta") || this.element.querySelector('[class$="__metadata"]');
+    return (
+      this.element.querySelector("#meta") ||
+      this.element.querySelector('[class$="__metadata"]')
+    );
   }
 
   get details() {
@@ -19,16 +22,18 @@ class VideoGridItem {
     return this.element.querySelector("a");
   }
 
-  get href() { 
+  get href() {
     return this.a?.href;
   }
 
-  /* 
+  /*
    * タイトルがうまく取得できていない場合は以下のコードをブラウザのコンソールで実行して再度実行して取得できるか確かめてください。
    * const I = 5; Object.keys(localStorage).filter((key) => localStorage.getItem(key) === "undefined").map((key) => `https://www.youtube.com/watch?v=${key.replace('tj::', '')}`).reverse().filter((url, i, arr) => (console.log("target length:", arr.length), true)).slice(I, I+1).forEach((url) => location.href = url);
    */
   get videoTitle() {
-    let title = this.element.querySelector("#video-title, [class$='__title'], h3[title]");
+    let title = this.element.querySelector(
+      "#video-title, [class$='__title'], h3[title]",
+    );
     if (!title) {
       console.warn("videoTitle not found", this.element);
       alert("videoTitle not found. Please report to the developer.");
@@ -54,11 +59,15 @@ class VideoGridItem {
   }
 
   isLive() {
-    return this.href?.includes('live/') || false;
+    return this.href?.includes("live/") || false;
   }
 
   isShort() {
     return this.href?.includes("shorts/") || false;
+  }
+
+  isLockupViewModel() {
+    return this.element.tagName?.toLowerCase() === "yt-lockup-view-model";
   }
 
   hasButton() {
@@ -83,13 +92,20 @@ class VideoGridItem {
     button.style.right = 0;
     button.style.backgroundColor = backgroundColor;
     button.style.color = color;
+    if (this.isLockupViewModel()) {
+      button.style.whiteSpace = "pre-line";
+    }
     button.style.opacity = 1.0;
     button.addEventListener("click", onClick);
+
     this.details?.appendChild(button);
     button.style.removeProperty("position");
     button.style.removeProperty("bottom");
     button.style.removeProperty("right");
-    if (this.meta?.className.includes("__metadata")) {
+    if (
+      !this.isLockupViewModel() &&
+      this.meta?.className.includes("__metadata")
+    ) {
       this.meta?.parentElement.appendChild(button);
     } else {
       this.meta?.appendChild(button);
@@ -98,11 +114,21 @@ class VideoGridItem {
   }
 
   createRemoveDarkButton() {
-    this.createButton("取り消す", "white", "black", this.onClickRemoveDark.bind(this));
+    this.createButton(
+      this.isLockupViewModel() ? "取\n消" : "取り消す",
+      "white",
+      "black",
+      this.onClickRemoveDark.bind(this),
+    );
   }
 
   createAddDarkButton() {
-    this.createButton("× 暗くする", "black", "white", this.onClickAddDark.bind(this));
+    this.createButton(
+      this.isLockupViewModel() ? "×\n暗\nく\nす\nる" : "× 暗くする",
+      "black",
+      "white",
+      this.onClickAddDark.bind(this),
+    );
   }
 
   applyDarkButton() {
@@ -111,7 +137,7 @@ class VideoGridItem {
       this.createRemoveDarkButton();
     } else {
       this.createAddDarkButton();
-    } 
+    }
   }
 
   removeDark() {
@@ -149,22 +175,27 @@ class VideoGridItem {
     this.createRemoveDarkButton();
     this.onClickAfter(button);
   }
-};
+}
 
 class BlackButtonController {
-
   constructor() {
     this.movieCount = 0;
     this.mutationUnsubscribe = null;
   }
 
   onLoad() {
-    if (document.readyState === "complete" || document.readyState === "interactive") {
+    if (
+      document.readyState === "complete" ||
+      document.readyState === "interactive"
+    ) {
       this.setup();
     } else {
-      window.addEventListener('load', this.setup.bind(this));
+      window.addEventListener("load", this.setup.bind(this));
     }
-    window.addEventListener('movieCountChange', this.updateBlackButton.bind(this));
+    window.addEventListener(
+      "movieCountChange",
+      this.updateBlackButton.bind(this),
+    );
   }
 
   setup() {
@@ -176,7 +207,9 @@ class BlackButtonController {
       window.setTimeout(this.setup.bind(this), 5000);
       return;
     }
-    this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(this.observe.bind(this));
+    this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(
+      this.observe.bind(this),
+    );
     this.observe();
   }
 
@@ -206,8 +239,9 @@ class BlackButtonController {
   }
 
   getFeedAdRichItems() {
-    return [...document.querySelectorAll("ytd-rich-item-renderer")]
-      .filter((e) => e.querySelector("feed-ad-metadata-view-model"));
+    return [...document.querySelectorAll("ytd-rich-item-renderer")].filter(
+      (e) => e.querySelector("feed-ad-metadata-view-model"),
+    );
   }
 
   addDarkButton() {
@@ -228,11 +262,10 @@ class BlackButtonController {
       ...document.querySelectorAll("ytd-video-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
       ...document.querySelectorAll("ytd-rich-item-renderer"),
-      ...document.querySelectorAll("yt-lockup-view-model"),
+      ...document.querySelectorAll("#contents > yt-lockup-view-model"),
     ].filter((e) => !e.querySelector("feed-ad-metadata-view-model"));
   }
-};
-
+}
 
 ((global) => {
   "use strict";

@@ -6,7 +6,7 @@ class VideoItem {
   // Getter & Setter
 
   get href() {
-    return this.e.querySelector('a')?.href;
+    return this.e.querySelector("a")?.href;
   }
 
   get id() {
@@ -25,12 +25,16 @@ class VideoItem {
     return this.e.tagName.toLowerCase() === "ytd-playlist-video-renderer";
   }
 
+  isLockupViewModel() {
+    return this.e.tagName.toLowerCase() === "yt-lockup-view-model";
+  }
+
   isProgress() {
     return this.e.querySelector("#progress") !== null;
   }
 
   isLive() {
-    return this.href.includes('live/');
+    return this.href.includes("live/");
   }
 
   isShort() {
@@ -91,13 +95,16 @@ class VideoItem {
 
   // Width Methods
   applyWidth200() {
+    if (this.isLockupViewModel()) {
+      return;
+    }
     this.e.style.width = "200px";
   }
 
   applyWidthReset() {
     this.e.style.width = "";
   }
-};
+}
 
 class ViewedBlackController {
   constructor() {
@@ -119,14 +126,26 @@ class ViewedBlackController {
   }
 
   onLoad() {
-    if (document.readyState === "complete" || document.readyState === "interactive") {
+    if (
+      document.readyState === "complete" ||
+      document.readyState === "interactive"
+    ) {
       this.setup();
     } else {
       window.addEventListener("load", this.setup.bind(this), { once: true });
     }
-    window.addEventListener("movieCountChange", this.updateViewedBlackOpacity.bind(this));
-    window.addEventListener("clickActionTJEvent", this.updateViewedBlackOpacity.bind(this));
-    window.addEventListener("clickViewedBlackButtonTJEvent", this.updateViewedBlackOpacity.bind(this));
+    window.addEventListener(
+      "movieCountChange",
+      this.updateViewedBlackOpacity.bind(this),
+    );
+    window.addEventListener(
+      "clickActionTJEvent",
+      this.updateViewedBlackOpacity.bind(this),
+    );
+    window.addEventListener(
+      "clickViewedBlackButtonTJEvent",
+      this.updateViewedBlackOpacity.bind(this),
+    );
   }
 
   setup() {
@@ -138,7 +157,9 @@ class ViewedBlackController {
       window.setTimeout(this.setup.bind(this), 5000);
       return;
     }
-    this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(this.observe.bind(this));
+    this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(
+      this.observe.bind(this),
+    );
     this.observe();
   }
 
@@ -159,15 +180,16 @@ class ViewedBlackController {
         this.switchContrast = value.tj_switch_contrast;
         this.applyOpacity();
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   applyOpacity() {
-    tjLog(`applyOpacity: ${Object.keys(ViewedBlackController.SWITCH_CONTRAST_TYPE)[this.switchContrast]}`);
+    tjLog(
+      `applyOpacity: ${Object.keys(ViewedBlackController.SWITCH_CONTRAST_TYPE)[this.switchContrast]}`,
+    );
     this.getAllMovies().forEach((e) => {
       let videoItem = new VideoItem(e);
-      switch(this.switchContrast) {
+      switch (this.switchContrast) {
         case ViewedBlackController.SWITCH_CONTRAST_TYPE.BLACK:
           if (videoItem.isViewedBlack()) {
             videoItem.applyViewedBlackOpacity();
@@ -236,7 +258,7 @@ class ViewedBlackController {
           }
           videoItem.applyWidth200();
           break;
-        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SIZE_WITDH_200_INVERT:          
+        case ViewedBlackController.SWITCH_CONTRAST_TYPE.SIZE_WITDH_200_INVERT:
           if (videoItem.isViewedBlack()) {
             if (videoItem.isProgress()) {
               videoItem.applyProgressOpacity();
@@ -259,6 +281,7 @@ class ViewedBlackController {
       ...document.querySelectorAll("ytd-rich-item-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
       ...document.querySelectorAll("ytd-video-renderer"),
+      ...document.querySelectorAll("#contents > yt-lockup-view-model"),
     ].filter((e) => !e.querySelector("feed-ad-metadata-view-model"));
   }
 
@@ -269,10 +292,11 @@ class ViewedBlackController {
   }
 
   getFeedAdRichItems() {
-    return [...document.querySelectorAll("ytd-rich-item-renderer")]
-      .filter((e) => e.querySelector("feed-ad-metadata-view-model"));
+    return [...document.querySelectorAll("ytd-rich-item-renderer")].filter(
+      (e) => e.querySelector("feed-ad-metadata-view-model"),
+    );
   }
-};
+}
 
 ((global) => {
   "use strict";

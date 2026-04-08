@@ -262,6 +262,8 @@ class DismissAdController {
       setTimeout(this.performSkipAction.bind(this), 5000);
       tjLog(`DismissAdController.performSkip: skip button not found`);
       return;
+    } else {
+      tjLog(`DismissAdController.performSkip: skip button found at (${oX}, ${oY})`);
     }
     this.runtimeAdSkip(oX, oY, (response) => {
       setTimeout(() => {

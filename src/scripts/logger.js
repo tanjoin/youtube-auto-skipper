@@ -1,6 +1,11 @@
 ((global) => {
   "use strict";
 
+  if (global.__tjLoggerInitialized) {
+    return;
+  }
+  global.__tjLoggerInitialized = true;
+
   function isLogEnabled() {
     return localStorage.getItem("tj::logEnabled") === "1";
   }

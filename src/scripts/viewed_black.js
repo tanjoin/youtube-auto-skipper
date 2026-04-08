@@ -316,5 +316,11 @@ class ViewedBlackController {
 
 ((global) => {
   "use strict";
+
+  if (global.__tjViewedBlackInitialized) {
+    return;
+  }
+  global.__tjViewedBlackInitialized = true;
+
   new ViewedBlackController().onLoad();
 })(this.self || global);

@@ -840,5 +840,11 @@ class ContentScriptController {
 
 ((global) => {
   "use strict";
+
+  if (global.__tjContentScriptInitialized) {
+    return;
+  }
+  global.__tjContentScriptInitialized = true;
+
   new ContentScriptController().onLoad();
 })(this.self || global);

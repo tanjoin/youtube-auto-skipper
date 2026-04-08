@@ -10,6 +10,22 @@ class VideoGridItem {
     );
   }
 
+  get buttonsContainer() {
+    return (
+      this.element.querySelector(":scope > #content ytd-rich-grid-media #buttons") ||
+      this.element.querySelector(":scope > #content #buttons") ||
+      this.element.querySelector("#buttons")
+    );
+  }
+
+  get detailsContainer() {
+    return (
+      this.element.querySelector(":scope > #content ytd-rich-grid-media #details") ||
+      this.element.querySelector(":scope > #content #details") ||
+      this.element.querySelector("#details")
+    );
+  }
+
   get overlay() {
     return this.element.querySelector("#overlays");
   }
@@ -86,11 +102,15 @@ class VideoGridItem {
     button.style.opacity = 1.0;
     button.addEventListener("click", onClick);
 
-    if (this.metadataContainer?.parentElement) {
+    if (this.buttonsContainer) {
+      this.buttonsContainer.appendChild(button);
+    } else if (this.metadataContainer?.parentElement) {
       this.metadataContainer.parentElement.insertBefore(
         button,
         this.metadataContainer.nextSibling,
       );
+    } else if (this.detailsContainer) {
+      this.detailsContainer.appendChild(button);
     } else {
       this.element.appendChild(button);
     }
@@ -254,5 +274,11 @@ class BlackButtonController {
 
 ((global) => {
   "use strict";
+
+  if (global.__tjBlackButtonInitialized) {
+    return;
+  }
+  global.__tjBlackButtonInitialized = true;
+
   new BlackButtonController().onLoad();
 })(this.self || global);

@@ -21,19 +21,30 @@
     const listeners = new Set();
     let observer = null;
     let isScheduled = false;
+    let pendingRecords = [];
+
+    const appendRecords = (records) => {
+      if (!Array.isArray(records) || records.length === 0) {
+        return;
+      }
+      pendingRecords.push(...records);
+    };
 
     const flush = () => {
       isScheduled = false;
+      const records = pendingRecords;
+      pendingRecords = [];
       listeners.forEach((listener) => {
         try {
-          listener();
+          listener(records);
         } catch (error) {
           global.tjLog(`tjMutationHub.flush: ${error}`);
         }
       });
     };
 
-    const schedule = () => {
+    const schedule = (records = []) => {
+      appendRecords(records);
       if (isScheduled) {
         return;
       }
@@ -49,7 +60,7 @@
       if (observer || !document.body) {
         return;
       }
-      observer = new MutationObserver(schedule);
+      observer = new MutationObserver((records) => schedule(records));
       observer.observe(document.body, {
         childList: true,
         subtree: true,
@@ -76,6 +87,41 @@
       trigger() {
         schedule();
       }
+    };
+  }
+
+  if (!global.tjMutationHelper) {
+    global.tjMutationHelper = {
+      findElements(records, selector) {
+        if (!Array.isArray(records) || records.length === 0) {
+          return [...document.querySelectorAll(selector)];
+        }
+
+        const elements = new Set();
+        const collect = (node) => {
+          if (!(node instanceof Element)) {
+            return;
+          }
+          if (node.matches(selector)) {
+            elements.add(node);
+          }
+          const closest = node.closest(selector);
+          if (closest) {
+            elements.add(closest);
+          }
+          node.querySelectorAll(selector).forEach((element) => elements.add(element));
+        };
+
+        records.forEach((record) => {
+          if (record.type !== "childList") {
+            return;
+          }
+          collect(record.target);
+          record.addedNodes.forEach(collect);
+        });
+
+        return [...elements];
+      },
     };
   }
 })(this.self || globalThis);

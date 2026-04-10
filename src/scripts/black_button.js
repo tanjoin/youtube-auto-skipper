@@ -216,7 +216,6 @@ class VideoGridItem {
 
 class BlackButtonController {
   constructor() {
-    this.movieCount = 0;
     this.mutationUnsubscribe = null;
   }
 
@@ -229,10 +228,6 @@ class BlackButtonController {
     } else {
       window.addEventListener("load", this.setup.bind(this), { once: true });
     }
-    window.addEventListener(
-      "movieCountChange",
-      this.updateBlackButton.bind(this),
-    );
   }
 
   setup() {
@@ -247,60 +242,62 @@ class BlackButtonController {
     this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(
       this.observe.bind(this),
     );
-    this.observe();
+    this.observe([]);
   }
 
-  observe() {
-    this.hideFeedAdRichItems();
-    const allVideoGridItems = this.getAllVideoGridItems();
-    if (this.movieCount !== allVideoGridItems.length) {
-      this.movieCount = allVideoGridItems.length;
-      window.dispatchEvent(new Event("movieCountChange"));
-      return;
-    }
-    if (allVideoGridItems.some((e) => !e.querySelector(".tj-kurakusuru"))) {
-      window.dispatchEvent(new Event("movieCountChange"));
-    }
-  }
-
-  updateBlackButton() {
+  observe(records = []) {
     tjLog(`BlackButtonController.updateBlackButton`);
-    this.hideFeedAdRichItems();
-    this.addDarkButton();
+    this.hideFeedAdRichItems(records);
+    this.addDarkButton(this.getTargetVideoGridItems(records));
   }
 
-  hideFeedAdRichItems() {
-    this.getFeedAdRichItems().forEach((e) => {
+  hideFeedAdRichItems(records = []) {
+    this.getFeedAdRichItems(records).forEach((e) => {
       e.style.setProperty("display", "none", "important");
     });
   }
 
-  getFeedAdRichItems() {
-    return [...document.querySelectorAll("ytd-rich-item-renderer")].filter(
+  getFeedAdRichItems(records = []) {
+    return globalThis.tjMutationHelper.findElements(
+      records,
+      "ytd-rich-item-renderer",
+    ).filter(
       (e) => e.querySelector("feed-ad-metadata-view-model"),
     );
   }
 
-  addDarkButton() {
-    this.getNotDarkedVideoGridItems().forEach((ygvr) => {
+  addDarkButton(elements = this.getAllVideoGridItems()) {
+    elements
+      .filter((element) => !new VideoGridItem(element).hasButton())
+      .forEach((ygvr) => {
       new VideoGridItem(ygvr).applyDarkButton();
     });
   }
 
-  getNotDarkedVideoGridItems() {
-    return this.getAllVideoGridItems().filter((e) => {
-      return !e.querySelector(".tj-kurakusuru");
-    });
+  getTargetVideoGridItems(records = []) {
+    return this.filterValidVideoGridItems([
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-grid-video-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-video-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-playlist-video-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-rich-item-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "#contents > yt-lockup-view-model"),
+    ]);
   }
 
   getAllVideoGridItems() {
-    return [
+    return this.filterValidVideoGridItems([
       ...document.querySelectorAll("ytd-grid-video-renderer"),
       ...document.querySelectorAll("ytd-video-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
       ...document.querySelectorAll("ytd-rich-item-renderer"),
       ...document.querySelectorAll("#contents > yt-lockup-view-model"),
-    ].filter((e) => !e.querySelector("feed-ad-metadata-view-model"));
+    ]);
+  }
+
+  filterValidVideoGridItems(elements) {
+    return [...new Set(elements)].filter(
+      (e) => e instanceof Element && !e.querySelector("feed-ad-metadata-view-model"),
+    );
   }
 }
 

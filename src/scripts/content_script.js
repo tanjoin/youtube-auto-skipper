@@ -41,137 +41,81 @@ class ViewedBlackSwitchLargeButton {
 
 // その他のトピック を削除
 class DeleteOtherTopicsController {
-  constructor() {
-    this.otherTopicsCount = 0;
-  }
+  onLoad() {}
 
-  onLoad() {
-    window.addEventListener("otherTopicsCountChange", this.deleteOtherTopics.bind(this));
-  }
-
-  observe() {
-    let otherTopics = this.getOtherTopics();
-    if (this.otherTopicsCount !== otherTopics.length) {
-      this.otherTopicsCount = otherTopics.length;
-      window.dispatchEvent(new Event("otherTopicsCountChange"));
-      return;
-    }
-    if (otherTopics.some((d) => d.style.display !== "none")) {
-      window.dispatchEvent(new Event("otherTopicsCountChange"));
-    }
+  observe(records = []) {
+    this.deleteOtherTopics(records);
   }
 
   // その他のトピック削除
-  deleteOtherTopics() {
+  deleteOtherTopics(records = []) {
     tjLog(`DeleteOtherTopicsController.deleteOtherTopics`);
-    this.getOtherTopics()
+    this.getOtherTopics(records)
       .forEach((d) => d.style.setProperty("display", "none", "important"));
   }
 
-  getOtherTopics() {
-    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+  getOtherTopics(records = []) {
+    return globalThis.tjMutationHelper.findElements(records, "ytd-rich-section-renderer")
         .filter((d) => d?.querySelector('#title')?.textContent.includes("その他のトピック"));
   }
 };
 
 class DeleteNewsAreaController {
-  constructor() {
-    this.newsAreaCount = 0;
-  }
+  onLoad() {}
 
-  onLoad() {
-    window.addEventListener("newsAreaCountChange", this.deleteNewsArea.bind(this));
-  }
-
-  observe() {
-    let newsAreas = this.getNewsArea();
-    if (this.newsAreaCount !== newsAreas.length) {
-      this.newsAreaCount = newsAreas.length;
-      window.dispatchEvent(new Event("newsAreaCountChange"));
-      return;
-    }
-    if (newsAreas.some((d) => d.style.display !== "none")) {
-      window.dispatchEvent(new Event("newsAreaCountChange"));
-    }
+  observe(records = []) {
+    this.deleteNewsArea(records);
   }
 
   // お知らせ削除
-  deleteNewsArea() {
+  deleteNewsArea(records = []) {
     tjLog(`DeleteNewsAreaController.deleteNewsArea`);
-    this.getNewsArea()
+    this.getNewsArea(records)
       .forEach((d) => d.style.setProperty("display", "none", "important"));
   }
 
-  getNewsArea() {
-    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+  getNewsArea(records = []) {
+    return globalThis.tjMutationHelper.findElements(records, "ytd-rich-section-renderer")
         .filter((d) => d?.querySelector('#title')?.textContent.includes("ニュース速報"));
   }
 };
 
 class DeleteRelatedAreaController {
-  constructor() {
-    this.relatedAreaCount = 0;
-  }
+  onLoad() {}
 
-  onLoad() {
-    window.addEventListener("relatedAreaCountChange", this.deleteRelatedArea.bind(this));
-  }
-
-  observe() {
-    let relatedAreas = this.getRelatedArea();
-    if (this.relatedAreaCount !== relatedAreas.length) {
-      this.relatedAreaCount = relatedAreas.length;
-      window.dispatchEvent(new Event("relatedAreaCountChange"));
-      return;
-    }
-    if (relatedAreas.some((d) => d.style.display !== "none")) {
-      window.dispatchEvent(new Event("relatedAreaCountChange"));
-    }
+  observe(records = []) {
+    this.deleteRelatedArea(records);
   }
 
   // 関連動画削除
-  deleteRelatedArea() {
+  deleteRelatedArea(records = []) {
     tjLog(`DeleteRelatedAreaController.deleteRelatedArea`);
-    this.getRelatedArea()
+    this.getRelatedArea(records)
       .forEach((d) => d.style.setProperty("display", "none", "important"));
   }
 
-  getRelatedArea() {
-    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+  getRelatedArea(records = []) {
+    return globalThis.tjMutationHelper.findElements(records, "ytd-rich-section-renderer")
         .filter((d) => d?.querySelector('#title')?.textContent.includes("関連が強い"));
   }
 };
 
 class DeleteShortAreaController {
-  constructor() {
-    this.shortAreaCount = 0;
-  }
+  onLoad() {}
 
-  onLoad() {
-    window.addEventListener("shortAreaCountChange", this.deleteShortArea.bind(this));
-  }
-
-  observe() {
-    let shortAreas = this.getShortArea();
-    if (this.shortAreaCount !== shortAreas.length) {
-      this.shortAreaCount = shortAreas.length;
-      window.dispatchEvent(new Event("shortAreaCountChange"));
-      return;
-    }
-    if (shortAreas.some((d) => d.style.display !== "none")) {
-      window.dispatchEvent(new Event("shortAreaCountChange"));
-    }
+  observe(records = []) {
+    this.deleteShortArea(records);
   }
 
   // ショート動画削除
-  deleteShortArea() {
+  deleteShortArea(records = []) {
     tjLog(`DeleteShortAreaController.deleteShortArea`);
-    this.getShortArea()
+    this.getShortArea(records)
       .forEach((d) => d.style.setProperty("display", "none", "important"));
   }
 
-  getShortArea() {
-    return [...document.querySelectorAll("ytd-rich-section-renderer")]
+  getShortArea(records = []) {
+    return globalThis.tjMutationHelper.findElements(records, "ytd-rich-section-renderer")
       .filter((d) => d.querySelector('a[href*="/shorts/"]'));
   }
 };
@@ -817,15 +761,15 @@ class ContentScriptController {
     }
   }
 
-  observe() {
+  observe(records = []) {
     this.urlChangeController.observe();
     this.dismissAdController.observe();
-    this.showViewedBlackLargeButtonController.observe();
-    this.deleteShortAreaController.observe();
-    this.deleteRelatedAreaController.observe();
-    this.deleteNewsAreaController.observe();
-    this.deleteOtherTopicsController.observe();
-    this.pressNextButtonController.observe();
+    this.showViewedBlackLargeButtonController.observe(records);
+    this.deleteShortAreaController.observe(records);
+    this.deleteRelatedAreaController.observe(records);
+    this.deleteNewsAreaController.observe(records);
+    this.deleteOtherTopicsController.observe(records);
+    this.pressNextButtonController.observe(records);
   }
 
   onUrlDidChangedToWatch() {

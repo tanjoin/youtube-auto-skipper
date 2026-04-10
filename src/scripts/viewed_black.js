@@ -108,7 +108,6 @@ class VideoItem {
 
 class ViewedBlackController {
   constructor() {
-    this.movieCount = 0;
     this.mutationUnsubscribe = null;
     this.switchContrast = undefined;
   }
@@ -138,12 +137,9 @@ class ViewedBlackController {
     try {
       chrome.storage.local.get({ tj_switch_contrast: 0 }, (value) => {
         this.switchContrast = value.tj_switch_contrast;
+        this.applyOpacity();
       });
     } catch (error) {}
-    window.addEventListener(
-      "movieCountChange",
-      this.movieCountChanged.bind(this),
-    );
     window.addEventListener(
       "clickActionTJEvent",
       this.updateViewedBlackOpacity.bind(this),
@@ -166,21 +162,20 @@ class ViewedBlackController {
     this.mutationUnsubscribe = globalThis.tjMutationHub.subscribe(
       this.observe.bind(this),
     );
-    this.observe();
+    this.observe([]);
   }
 
-  observe() {
-    this.hideFeedAdRichItems();
-    const allMovies = this.getAllMovies();
-    if (this.movieCount !== allMovies.length) {
-      this.movieCount = allMovies.length;
-      window.dispatchEvent(new Event("movieCountChange"));
+  observe(records = []) {
+    this.hideFeedAdRichItems(records);
+    if (this.switchContrast === undefined) {
+      return;
     }
+    this.applyOpacity(this.getTargetMovies(records));
   }
 
   updateViewedBlackOpacity() {
     tjLog(`ViewedBlackController.updateViewedBlackOpacity`);
-    this.hideFeedAdRichItems();
+    this.hideFeedAdRichItems([]);
     try {
       chrome.storage.local.get({ tj_switch_contrast: false }, (value) => {
         this.switchContrast = value.tj_switch_contrast;
@@ -189,21 +184,11 @@ class ViewedBlackController {
     } catch (error) {}
   }
 
-  movieCountChanged() {
-    tjLog(`ViewedBlackController.movieCountChanged`);
-    this.hideFeedAdRichItems();
-    if (this.switchContrast !== undefined) {
-      this.applyOpacity();
-    } else {
-      this.updateViewedBlackOpacity();
-    }
-  }
-
-  applyOpacity() {
+  applyOpacity(elements = this.getAllMovies()) {
     tjLog(
       `applyOpacity: ${Object.keys(ViewedBlackController.SWITCH_CONTRAST_TYPE)[this.switchContrast]}`,
     );
-    this.getAllMovies().forEach((e) => {
+    elements.forEach((e) => {
       let videoItem = new VideoItem(e);
       switch (this.switchContrast) {
         case ViewedBlackController.SWITCH_CONTRAST_TYPE.BLACK:
@@ -291,25 +276,44 @@ class ViewedBlackController {
     });
   }
 
+  getTargetMovies(records = []) {
+    return this.filterValidMovies([
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-grid-video-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-rich-item-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-playlist-video-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "ytd-video-renderer"),
+      ...globalThis.tjMutationHelper.findElements(records, "#contents > yt-lockup-view-model"),
+    ]);
+  }
+
   getAllMovies() {
-    return [
+    return this.filterValidMovies([
       ...document.querySelectorAll("ytd-grid-video-renderer"),
       ...document.querySelectorAll("ytd-rich-item-renderer"),
       ...document.querySelectorAll("ytd-playlist-video-renderer"),
       ...document.querySelectorAll("ytd-video-renderer"),
       ...document.querySelectorAll("#contents > yt-lockup-view-model"),
-    ].filter((e) => !e.querySelector("feed-ad-metadata-view-model"));
+    ]);
   }
 
-  hideFeedAdRichItems() {
-    this.getFeedAdRichItems().forEach((e) => {
+  hideFeedAdRichItems(records = []) {
+    this.getFeedAdRichItems(records).forEach((e) => {
       e.style.setProperty("display", "none", "important");
     });
   }
 
-  getFeedAdRichItems() {
-    return [...document.querySelectorAll("ytd-rich-item-renderer")].filter(
+  getFeedAdRichItems(records = []) {
+    return globalThis.tjMutationHelper.findElements(
+      records,
+      "ytd-rich-item-renderer",
+    ).filter(
       (e) => e.querySelector("feed-ad-metadata-view-model"),
+    );
+  }
+
+  filterValidMovies(elements) {
+    return [...new Set(elements)].filter(
+      (e) => e instanceof Element && !e.querySelector("feed-ad-metadata-view-model"),
     );
   }
 }

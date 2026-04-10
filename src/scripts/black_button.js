@@ -26,6 +26,10 @@ class VideoGridItem {
     );
   }
 
+  get metaContainer() {
+    return this.element.querySelector(":scope > #content #meta") || this.element.querySelector("#meta");
+  }
+
   get overlay() {
     return this.element.querySelector("#overlays");
   }
@@ -78,6 +82,20 @@ class VideoGridItem {
     return this.href?.includes("shorts/") || false;
   }
 
+  isPlaylistVideo() {
+    return this.element.tagName.toLowerCase() === "ytd-playlist-video-renderer";
+  }
+
+  isInPlaylistVideoListContents() {
+    if (!this.isPlaylistVideo()) {
+      return false;
+    }
+    const contents = this.element.closest(
+      "ytd-playlist-video-list-renderer #contents",
+    );
+    return contents !== null;
+  }
+
   hasButton() {
     return this.element.querySelector(".tj-kurakusuru") !== null;
   }
@@ -100,9 +118,22 @@ class VideoGridItem {
     button.style.backgroundColor = backgroundColor;
     button.style.color = color;
     button.style.opacity = 1.0;
+
+    if (this.isInPlaylistVideoListContents()) {
+      button.style.display = "inline-block";
+      button.style.width = "auto";
+      button.style.marginTop = "6px";
+      button.style.marginLeft = "0";
+      button.style.padding = "2px 6px";
+      button.style.whiteSpace = "nowrap";
+      button.style.flexShrink = "0";
+    }
+
     button.addEventListener("click", onClick);
 
-    if (this.buttonsContainer) {
+    if (this.isInPlaylistVideoListContents() && this.metaContainer) {
+      this.metaContainer.appendChild(button);
+    } else if (this.buttonsContainer) {
       this.buttonsContainer.appendChild(button);
     } else if (this.metadataContainer?.parentElement) {
       this.metadataContainer.parentElement.insertBefore(
@@ -150,7 +181,8 @@ class VideoGridItem {
   }
 
   addDark() {
-    localStorage.setItem("tj::" + this.id, this.videoTitle?.textContent);
+    const title = this.videoTitle?.textContent?.trim();
+    localStorage.setItem("tj::" + this.id, title);
   }
 
   onClickBefore(button) {

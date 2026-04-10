@@ -318,7 +318,7 @@ class ReloadConfirmDialog {
       this.element.appendChild(flexBox);
 
       let message = document.createElement("div");
-      message.textContent = "リロードしますか？";
+      message.textContent = "広告をスキップできません。Enter でリロード / Esc で閉じる";
       message.style.textAlign = "center";
       message.style.paddingRight = "12px";
       flexBox.appendChild(message);
@@ -333,24 +333,6 @@ class ReloadConfirmDialog {
       buttons.style.paddingRight = "8px";
       buttons.style.height = "100%";
       flexBox.appendChild(buttons);
-
-      let yes = document.createElement("button");
-      yes.textContent = "はい";
-      yes.style.backgroundColor = "rgb(207, 226, 255)";
-      yes.style.color = "rgb(5, 44, 101)";
-      yes.style.border = "0";
-      yes.style.padding = "6px";
-      yes.style.cursor = "pointer";
-      yes.style.height = "100%";
-      yes.style.minWidth = "180px";
-      yes.style.fontSize = "16px";
-      yes.style.fontWeight = "bold";
-      yes.addEventListener("click", () => {
-        tjLog(`ReloadConfirmDialog.yes.click`);
-        this.confirmReload();
-      });
-      buttons.appendChild(yes);
-      this.yes = yes;
 
       let close = document.createElement("button");
       close.textContent = "×";
@@ -369,7 +351,7 @@ class ReloadConfirmDialog {
       buttons.appendChild(close);
 
       flexBox.addEventListener("click", (event) => {
-        if (event.target === close || event.target === yes) {
+        if (event.target === close) {
           return;
         }
         tjLog(`ReloadConfirmDialog.yes.click`);
@@ -378,7 +360,7 @@ class ReloadConfirmDialog {
 
       document.body.appendChild(this.element);
       document.addEventListener("keydown", this.onKeyDown);
-      setTimeout(() => this.yes?.focus(), 0);
+      setTimeout(() => close?.focus(), 0);
     }
   }
 

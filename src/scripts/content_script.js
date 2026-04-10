@@ -124,22 +124,82 @@ class DismissAdController {
   constructor() {
     this.isRunning = false;
     this.wasAdInterrupting = false;
+    this.retryTimer = null;
+    this.heartbeatTimer = null;
   }
 
-  onLoad() {}
+  onLoad() {
+    window.addEventListener("pagehide", this.clearRetryTimer.bind(this));
+    window.addEventListener("pagehide", this.stopHeartbeat.bind(this));
+    window.addEventListener("pageshow", this.startHeartbeat.bind(this));
+    window.addEventListener("pageshow", this.handleNavigationEvent.bind(this));
+    window.addEventListener("popstate", this.handleNavigationEvent.bind(this));
+    this.startHeartbeat();
+  }
+
+  handleNavigationEvent() {
+    if (!this.isVideoPage()) {
+      return;
+    }
+    this.performSkipAction();
+    this.scheduleRetry(900);
+  }
+
+  clearRetryTimer() {
+    if (this.retryTimer !== null) {
+      clearTimeout(this.retryTimer);
+      this.retryTimer = null;
+    }
+  }
+
+  scheduleRetry(ms = 1200) {
+    if (this.retryTimer !== null) {
+      return;
+    }
+    this.retryTimer = setTimeout(() => {
+      this.retryTimer = null;
+      if (this.getAdInterruptingElement()) {
+        this.performSkipAction();
+      }
+    }, ms);
+  }
+
+  startHeartbeat() {
+    if (this.heartbeatTimer !== null) {
+      return;
+    }
+    this.heartbeatTimer = setInterval(() => {
+      if (!this.isVideoPage()) {
+        return;
+      }
+      this.observe();
+    }, 1200);
+  }
+
+  stopHeartbeat() {
+    if (this.heartbeatTimer === null) {
+      return;
+    }
+    clearInterval(this.heartbeatTimer);
+    this.heartbeatTimer = null;
+  }
 
   observe() {
     const isAdInterrupting = this.getAdInterruptingElement() !== null;
     const isReloadDialogVisible = ReloadConfirmDialog.isExist();
 
-    // Trigger ad-skip only on transition to ad state.
-    if (isAdInterrupting && !this.wasAdInterrupting) {
+    // 元実装寄りに、広告中は継続的にスキップを試行する
+    if (isAdInterrupting) {
       this.performSkipAction();
+      this.scheduleRetry(1200);
     }
 
     // Clear dialog only when ad state ends and dialog is visible.
     if (!isAdInterrupting && isReloadDialogVisible && this.wasAdInterrupting) {
       this.dismissReloadConfirmDialog();
+    }
+    if (!isAdInterrupting) {
+      this.clearRetryTimer();
     }
 
     this.wasAdInterrupting = isAdInterrupting;
@@ -210,7 +270,8 @@ class DismissAdController {
     let oX = button.getBoundingClientRect().x;
     let oY = button.getBoundingClientRect().y;
     if (oX <= 0 || oY <= 0) {
-      setTimeout(this.performSkipAction.bind(this), 5000);
+      this.isRunning = false;
+      this.scheduleRetry(1500);
       tjLog(`DismissAdController.performSkip: skip button not found`);
       return;
     } else {
@@ -223,6 +284,7 @@ class DismissAdController {
           document.documentElement.requestFullscreen();
         }
         ReloadConfirmDialog.clear();
+        this.clearRetryTimer();
         this.isRunning = false;
       }, 1000);
     });
@@ -250,7 +312,7 @@ class DismissAdController {
       );
       let isFullscreen = document.fullscreenElement != null;
       tjLog(`DismissAdController.performSkipAction: ${seconds} seconds`);
-      if (seconds > 10) {
+      if (seconds > 5) {
         this.checkCurrentTime();
         let params = new URLSearchParams(location.search);
         if (isFullscreen) {
@@ -267,6 +329,9 @@ class DismissAdController {
       }
     }
     tjLog(`DismissAdController.performSkipAction: skip button not found`);
+    if (adInterruptingElement) {
+      this.scheduleRetry(1200);
+    }
     setTimeout(() => this.isRunning = false, 1000);
   }
 
@@ -281,6 +346,7 @@ class DismissAdController {
 
   dismissReloadConfirmDialog() {
     ReloadConfirmDialog.clear();
+    this.clearRetryTimer();
   }
 };
 

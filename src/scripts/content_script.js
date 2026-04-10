@@ -765,6 +765,107 @@ class PressNextButtonController {
   }
 }
 
+class VersionOverlayController {
+  constructor() {
+    this.sequence = [
+      "ArrowUp",
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowLeft",
+      "ArrowRight",
+      "b",
+      "a",
+    ];
+    this.index = 0;
+    this.overlayId = "tj_version_overlay";
+  }
+
+  onLoad() {
+    window.addEventListener("keydown", this.handleKeyDown.bind(this));
+  }
+
+  handleKeyDown(event) {
+    if (this.isTypingTarget(event.target)) {
+      return;
+    }
+
+    const key = this.normalizeKey(event.key);
+    if (!key) {
+      return;
+    }
+
+    const expected = this.sequence[this.index];
+    if (key === expected) {
+      this.index += 1;
+      if (this.index === this.sequence.length) {
+        this.index = 0;
+        this.showVersion();
+      }
+      return;
+    }
+
+    this.index = key === this.sequence[0] ? 1 : 0;
+  }
+
+  normalizeKey(key) {
+    if (!key) {
+      return null;
+    }
+    if (key.startsWith("Arrow")) {
+      return key;
+    }
+    if (key.length === 1) {
+      return key.toLowerCase();
+    }
+    return null;
+  }
+
+  isTypingTarget(target) {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+    const tag = target.tagName.toLowerCase();
+    if (tag === "input" || tag === "textarea") {
+      return true;
+    }
+    return target.isContentEditable;
+  }
+
+  getVersion() {
+    try {
+      return chrome.runtime.getManifest().version;
+    } catch (error) {
+      return "unknown";
+    }
+  }
+
+  showVersion() {
+    const text = `youtube-auto-skipper: ${this.getVersion()}`;
+    let overlay = document.getElementById(this.overlayId);
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = this.overlayId;
+      overlay.style.position = "fixed";
+      overlay.style.top = "8px";
+      overlay.style.left = "8px";
+      overlay.style.zIndex = "2147483647";
+      overlay.style.padding = "6px 8px";
+      overlay.style.borderRadius = "4px";
+      overlay.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+      overlay.style.color = "#fff";
+      overlay.style.fontSize = "12px";
+      overlay.style.fontFamily = "monospace";
+      overlay.style.pointerEvents = "none";
+      document.body.appendChild(overlay);
+    }
+    overlay.textContent = text;
+    overlay.style.display = "block";
+  }
+}
+
 class ContentScriptController {
   constructor() {
     this.oldUrl = "";
@@ -778,6 +879,7 @@ class ContentScriptController {
     this.dismissAdController = new DismissAdController();
     this.skipMembersOnlyController = new SkipMembersOnlyController();
     this.pressNextButtonController = new PressNextButtonController();
+    this.versionOverlayController = new VersionOverlayController();
   }
 
   onLoad() {
@@ -795,6 +897,7 @@ class ContentScriptController {
     this.deleteNewsAreaController.onLoad();
     this.deleteOtherTopicsController.onLoad();
     this.pressNextButtonController.onLoad();
+    this.versionOverlayController.onLoad();
     this.updateIcon();
   }
 
@@ -815,15 +918,30 @@ class ContentScriptController {
     }
   }
 
+  isWatchLikePage() {
+    if (location.pathname.includes("/shorts/")) {
+      return true;
+    }
+    if (location.pathname.includes("/live/")) {
+      return true;
+    }
+    return location.href.includes("/watch?v=");
+  }
+
   observe(records = []) {
     this.urlChangeController.observe();
-    this.dismissAdController.observe();
-    this.showViewedBlackLargeButtonController.observe(records);
+
+    if (this.isWatchLikePage()) {
+      this.dismissAdController.observe();
+      this.showViewedBlackLargeButtonController.observe(records);
+      this.pressNextButtonController.observe(records);
+      return;
+    }
+
     this.deleteShortAreaController.observe(records);
     this.deleteRelatedAreaController.observe(records);
     this.deleteNewsAreaController.observe(records);
     this.deleteOtherTopicsController.observe(records);
-    this.pressNextButtonController.observe(records);
   }
 
   onUrlDidChangedToWatch() {

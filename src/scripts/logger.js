@@ -22,6 +22,39 @@
     let observer = null;
     let isScheduled = false;
     let pendingRecords = [];
+    let lastFlushAt = 0;
+    let scheduleHandle = null;
+    let scheduleKind = null;
+
+    const VISIBLE_MIN_INTERVAL = 350;
+    const HIDDEN_MIN_INTERVAL = 2000;
+
+    const now = () => {
+      if (global.performance?.now) {
+        return global.performance.now();
+      }
+      return Date.now();
+    };
+
+    const getMinInterval = () => {
+      if (document.visibilityState === "hidden") {
+        return HIDDEN_MIN_INTERVAL;
+      }
+      return VISIBLE_MIN_INTERVAL;
+    };
+
+    const clearScheduledHandle = () => {
+      if (scheduleHandle === null) {
+        return;
+      }
+      if (scheduleKind === "animationFrame") {
+        global.cancelAnimationFrame(scheduleHandle);
+      } else {
+        global.clearTimeout(scheduleHandle);
+      }
+      scheduleHandle = null;
+      scheduleKind = null;
+    };
 
     const appendRecords = (records) => {
       if (!Array.isArray(records) || records.length === 0) {
@@ -32,6 +65,9 @@
 
     const flush = () => {
       isScheduled = false;
+      scheduleHandle = null;
+      scheduleKind = null;
+      lastFlushAt = now();
       const records = pendingRecords;
       pendingRecords = [];
       listeners.forEach((listener) => {
@@ -48,12 +84,28 @@
       if (isScheduled) {
         return;
       }
+
+      const minInterval = getMinInterval();
+      const elapsed = now() - lastFlushAt;
+      const delay = Math.max(0, minInterval - elapsed);
+
       isScheduled = true;
-      if (typeof global.requestAnimationFrame === "function") {
-        global.requestAnimationFrame(flush);
+      if (delay === 0 && document.visibilityState !== "hidden" && typeof global.requestAnimationFrame === "function") {
+        scheduleKind = "animationFrame";
+        scheduleHandle = global.requestAnimationFrame(flush);
       } else {
-        global.setTimeout(flush, 16);
+        scheduleKind = "timeout";
+        scheduleHandle = global.setTimeout(flush, delay);
       }
+    };
+
+    const rescheduleForVisibilityState = () => {
+      if (!isScheduled) {
+        return;
+      }
+      clearScheduledHandle();
+      isScheduled = false;
+      schedule();
     };
 
     const startObserver = () => {
@@ -77,6 +129,8 @@
       global.addEventListener("DOMContentLoaded", startOnReady, { once: true });
       global.addEventListener("load", startOnReady, { once: true });
     };
+
+    document.addEventListener("visibilitychange", rescheduleForVisibilityState);
 
     global.tjMutationHub = {
       subscribe(listener) {

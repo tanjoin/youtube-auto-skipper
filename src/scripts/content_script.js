@@ -456,24 +456,51 @@ class ReloadConfirmDialog {
 class ShowViewedBlackLargeButtonController {
   constructor() {
     this.currentBelow = null;
+    this.isRenderScheduled = false;
   }
 
   onLoad() {
-    window.addEventListener("showBelow", this.viewedBlack.bind(this));
     window.addEventListener("tabActivatedTJEvent", this.viewedBlack.bind(this));
   }
+
+  scheduleViewedBlack() {
+    if (this.isRenderScheduled) {
+      return;
+    }
+    this.isRenderScheduled = true;
+    const flush = () => {
+      this.isRenderScheduled = false;
+      this.viewedBlack();
+    };
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(flush);
+    } else {
+      window.setTimeout(flush, 16);
+    }
+  }
   
-  observe() {
+  observe(records = []) {
     let below = this.getBelow();
-    if (below && below !== this.currentBelow) {
-      this.currentBelow = this.getBelow();
-      window.dispatchEvent(new Event("showBelow"));
+    if (!below) {
+      this.currentBelow = null;
+      return;
+    }
+
+    const currentBelowDetached =
+      this.currentBelow && !document.body.contains(this.currentBelow);
+    const buttonMissing = this.getViewedBlackMain() === null;
+    const belowChanged = below !== this.currentBelow || currentBelowDetached;
+    const belowAffected = this.isBelowAffected(records, below);
+
+    if (belowChanged || (buttonMissing && (records.length === 0 || belowAffected))) {
+      this.currentBelow = below;
+      this.scheduleViewedBlack();
     }
   }
 
   urlChange() {
     this.currentBelow = null;
-    this.viewedBlack();
+    this.scheduleViewedBlack();
   }
 
   // Getter & Setter
@@ -484,6 +511,33 @@ class ShowViewedBlackLargeButtonController {
 
   getViewedBlackMain() {
     return document.getElementById("viewed_black_main");
+  }
+
+  isBelowAffected(records, below) {
+    if (!Array.isArray(records) || records.length === 0) {
+      return true;
+    }
+
+    return records.some((record) => {
+      if (!(record.target instanceof Node)) {
+        return false;
+      }
+
+      if (record.target === below) {
+        return true;
+      }
+
+      if (record.target instanceof Element && record.target.contains(below)) {
+        return true;
+      }
+
+      return [...record.addedNodes].some((node) => {
+        if (!(node instanceof Node)) {
+          return false;
+        }
+        return node === below || (node instanceof Element && node.contains(below));
+      });
+    });
   }
 
   getVideoId() {

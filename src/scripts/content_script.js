@@ -123,19 +123,26 @@ class DeleteShortAreaController {
 class DismissAdController {
   constructor() {
     this.isRunning = false;
+    this.wasAdInterrupting = false;
   }
 
-  onLoad() {
-    window.addEventListener("showAd", this.performSkipAction.bind(this));
-    window.addEventListener("hideAd", this.dismissReloadConfirmDialog.bind(this));
-  }
+  onLoad() {}
 
   observe() {
-    if (this.getAdInterruptingElement()) {
-      window.dispatchEvent(new Event("showAd"));
-    } else if (ReloadConfirmDialog.isExist()) {
-      window.dispatchEvent(new Event("hideAd"));
+    const isAdInterrupting = this.getAdInterruptingElement() !== null;
+    const isReloadDialogVisible = ReloadConfirmDialog.isExist();
+
+    // Trigger ad-skip only on transition to ad state.
+    if (isAdInterrupting && !this.wasAdInterrupting) {
+      this.performSkipAction();
     }
+
+    // Clear dialog only when ad state ends and dialog is visible.
+    if (!isAdInterrupting && isReloadDialogVisible && this.wasAdInterrupting) {
+      this.dismissReloadConfirmDialog();
+    }
+
+    this.wasAdInterrupting = isAdInterrupting;
   }
 
   urlChange() {

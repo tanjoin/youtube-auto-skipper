@@ -134,6 +134,8 @@ class ViewedBlackController {
     } else {
       window.addEventListener("load", this.setup.bind(this), { once: true });
     }
+    window.addEventListener("pagehide", this.pageHide.bind(this));
+    window.addEventListener("pageshow", this.pageShow.bind(this));
     try {
       chrome.storage.local.get({ tj_switch_contrast: 0 }, (value) => {
         this.switchContrast = value.tj_switch_contrast;
@@ -148,6 +150,17 @@ class ViewedBlackController {
       "clickViewedBlackButtonTJEvent",
       this.updateViewedBlackOpacity.bind(this),
     );
+  }
+
+  pageHide() {
+    if (this.mutationUnsubscribe) {
+      this.mutationUnsubscribe();
+      this.mutationUnsubscribe = null;
+    }
+  }
+
+  pageShow() {
+    this.setup();
   }
 
   setup() {

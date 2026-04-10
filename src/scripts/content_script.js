@@ -648,10 +648,15 @@ class UrlChangeController {
   constructor() {
     this.oldUrl = location.href;
     this.onUrlDidChangedToWatch = undefined;
+    this.onUrlChanged = undefined;
   }
 
   registerOnUrlDidChangedToWatchListener(onUrlDidChangedToWatch) {
     this.onUrlDidChangedToWatch = onUrlDidChangedToWatch;
+  }
+
+  registerOnUrlChangedListener(onUrlChanged) {
+    this.onUrlChanged = onUrlChanged;
   }
 
   onLoad() {
@@ -677,6 +682,9 @@ class UrlChangeController {
 
   urlChange() {
     tjLog(`UrlChangeController.urlChange`);
+    if (this.onUrlChanged) {
+      this.onUrlChanged();
+    }
     if (location.href.includes("/watch?v=") && this.onUrlDidChangedToWatch) {
       this.onUrlDidChangedToWatch();
     }
@@ -878,6 +886,7 @@ class ContentScriptController {
       window.addEventListener("load", this.setup.bind(this), { once: true });
     }
     this.urlChangeController.registerOnUrlDidChangedToWatchListener(this.onUrlDidChangedToWatch.bind(this));
+    this.urlChangeController.registerOnUrlChangedListener(this.onUrlChanged.bind(this));
     this.urlChangeController.onLoad();
     this.dismissAdController.onLoad();
     this.showViewedBlackLargeButtonController.onLoad();
@@ -887,7 +896,22 @@ class ContentScriptController {
     this.deleteOtherTopicsController.onLoad();
     this.pressNextButtonController.onLoad();
     this.versionOverlayController.onLoad();
+    window.addEventListener("pagehide", this.pageHide.bind(this));
+    window.addEventListener("pageshow", this.pageShow.bind(this));
     this.updateIcon();
+  }
+
+  pageHide() {
+    if (this.mutationUnsubscribe) {
+      this.mutationUnsubscribe();
+      this.mutationUnsubscribe = null;
+    }
+    this.dismissAdController.dismissReloadConfirmDialog();
+    document.getElementById("tj_version_overlay")?.remove();
+  }
+
+  pageShow() {
+    this.setup();
   }
 
   setup() {
@@ -938,6 +962,11 @@ class ContentScriptController {
     this.dismissAdController.urlChange();
     this.pressNextButtonController.urlChange();
     this.skipMembersOnlyController.skip({ isVerifyLater: true });
+  }
+
+  onUrlChanged() {
+    this.dismissAdController.dismissReloadConfirmDialog();
+    document.getElementById("tj_version_overlay")?.remove();
   }
 
   updateIcon() {

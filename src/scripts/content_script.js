@@ -142,7 +142,7 @@ class DismissAdController {
       return;
     }
     this.performSkipAction();
-    this.scheduleRetry(900);
+    this.scheduleRetry();
   }
 
   clearRetryTimer() {
@@ -152,7 +152,7 @@ class DismissAdController {
     }
   }
 
-  scheduleRetry(ms = 1200) {
+  scheduleRetry(ms = 5000) {
     if (this.retryTimer !== null) {
       return;
     }
@@ -191,7 +191,7 @@ class DismissAdController {
     // 元実装寄りに、広告中は継続的にスキップを試行する
     if (isAdInterrupting) {
       this.performSkipAction();
-      this.scheduleRetry(1200);
+      this.scheduleRetry();
     }
 
     // Clear dialog only when ad state ends and dialog is visible.
@@ -271,7 +271,7 @@ class DismissAdController {
     let oY = button.getBoundingClientRect().y;
     if (oX <= 0 || oY <= 0) {
       this.isRunning = false;
-      this.scheduleRetry(1500);
+      this.scheduleRetry();
       tjLog(`DismissAdController.performSkip: skip button not found`);
       return;
     } else {
@@ -330,7 +330,7 @@ class DismissAdController {
     }
     tjLog(`DismissAdController.performSkipAction: skip button not found`);
     if (adInterruptingElement) {
-      this.scheduleRetry(1200);
+      this.scheduleRetry();
     }
     setTimeout(() => this.isRunning = false, 1000);
   }

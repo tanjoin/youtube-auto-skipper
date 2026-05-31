@@ -80,6 +80,26 @@ class DeleteNewsAreaController {
   }
 };
 
+class DeleteLatestYouTubePostsController {
+  onLoad() {}
+
+  observe(records = []) {
+    this.deleteLatestYouTubePosts(records);
+  }
+
+  // 最新の YouTube 投稿削除
+  deleteLatestYouTubePosts(records = []) {
+    tjLog(`DeleteLatestYouTubePostsController.deleteLatestYouTubePosts`);
+    this.getLatestYouTubePosts(records)
+      .forEach((d) => d.style.setProperty("display", "none", "important"));
+  }
+
+  getLatestYouTubePosts(records = []) {
+    return globalThis.tjMutationHelper.findElements(records, "ytd-rich-section-renderer")
+        .filter((d) => d?.querySelector('#title')?.textContent.includes("最新の YouTube 投稿"));
+  }
+};
+
 class DeleteRelatedAreaController {
   onLoad() {}
 
@@ -938,6 +958,7 @@ class ContentScriptController {
     this.deleteShortAreaController = new DeleteShortAreaController();
     this.deleteRelatedAreaController = new DeleteRelatedAreaController();
     this.deleteNewsAreaController = new DeleteNewsAreaController();
+    this.deleteLatestYouTubePostsController = new DeleteLatestYouTubePostsController();
     this.deleteOtherTopicsController = new DeleteOtherTopicsController();
     this.dismissAdController = new DismissAdController();
     this.skipMembersOnlyController = new SkipMembersOnlyController();
@@ -959,6 +980,7 @@ class ContentScriptController {
     this.deleteShortAreaController.onLoad();
     this.deleteRelatedAreaController.onLoad();
     this.deleteNewsAreaController.onLoad();
+    this.deleteLatestYouTubePostsController.onLoad();
     this.deleteOtherTopicsController.onLoad();
     this.pressNextButtonController.onLoad();
     this.versionOverlayController.onLoad();
@@ -1020,6 +1042,7 @@ class ContentScriptController {
     this.deleteShortAreaController.observe(records);
     this.deleteRelatedAreaController.observe(records);
     this.deleteNewsAreaController.observe(records);
+    this.deleteLatestYouTubePostsController.observe(records);
     this.deleteOtherTopicsController.observe(records);
   }
 

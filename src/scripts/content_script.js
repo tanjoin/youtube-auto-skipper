@@ -140,6 +140,26 @@ class DeleteShortAreaController {
   }
 };
 
+class DeleteGameRoomAreaController {
+  onload() {}
+
+  observe(records = []) {
+    this.deleteGameRoomArea(records);
+  }
+
+  // ゲームルーム削除
+  deleteGameRoomArea(records = []) {
+    tjLog(`DeleteGameRoomAreaController.deleteGameRoomArea`);
+    this.getGameRoomArea(records)
+      .forEach((d) => d.style.setProperty("display", "none", "important"));
+  }
+
+  getGameRoomArea(records = []) {
+    return globalThis.tjMutationHelper.findElements(records, "ytd-rich-section-renderer")
+      .filter((d) => d?.querySelector('#title')?.textContent.includes("ゲームルーム"));
+  }
+};
+
 class DismissAdController {
   constructor() {
     this.isRunning = false;
@@ -956,6 +976,7 @@ class ContentScriptController {
     this.urlChangeController = new UrlChangeController();
     this.showViewedBlackLargeButtonController = new ShowViewedBlackLargeButtonController();
     this.deleteShortAreaController = new DeleteShortAreaController();
+    this.deleteGameRoomAreaController = new DeleteGameRoomAreaController();
     this.deleteRelatedAreaController = new DeleteRelatedAreaController();
     this.deleteNewsAreaController = new DeleteNewsAreaController();
     this.deleteLatestYouTubePostsController = new DeleteLatestYouTubePostsController();
@@ -978,6 +999,7 @@ class ContentScriptController {
     this.dismissAdController.onLoad();
     this.showViewedBlackLargeButtonController.onLoad();
     this.deleteShortAreaController.onLoad();
+    this.deleteGameRoomAreaController.onLoad();
     this.deleteRelatedAreaController.onLoad();
     this.deleteNewsAreaController.onLoad();
     this.deleteLatestYouTubePostsController.onLoad();
@@ -1040,6 +1062,7 @@ class ContentScriptController {
     }
 
     this.deleteShortAreaController.observe(records);
+    this.deleteGameRoomAreaController.observe(records);
     this.deleteRelatedAreaController.observe(records);
     this.deleteNewsAreaController.observe(records);
     this.deleteLatestYouTubePostsController.observe(records);
